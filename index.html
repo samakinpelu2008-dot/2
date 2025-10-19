@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechSmartNG - Honest Reviews, Smart Choices</title>
+<style>
+body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#fff; color:#333; }
+header { background:#004aad; color:#fff; text-align:center; padding:1.5rem; position:sticky; top:0; z-index:10; }
+header h1 { margin:0; color:gold; font-size:2rem; }
+header p { margin:0; font-size:1rem; color:#f0f0f0; }
+nav { background:#003a8c; display:flex; justify-content:center; flex-wrap:wrap; }
+nav a { color:#fff; text-decoration:none; padding:1rem; font-weight:600; transition:0.3s; }
+nav a:hover { background:gold; color:#003a8c; }
+section { padding:2rem 1rem; max-width:1000px; margin:auto; }
+h2 { color:#004aad; border-left:5px solid gold; padding-left:.5rem; }
+.card { display:flex; flex-wrap:wrap; margin-bottom:2rem; background:#f8f8f8; border-radius:10px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1); transition:transform 0.3s ease; }
+.card:hover { transform:translateY(-5px); }
+.card img { width:100%; max-width:300px; object-fit:cover; }
+.card-content { flex:1; padding:1rem; }
+.buy-btn, .read-btn { display:inline-block; background:gold; color:#003a8c; padding:.5rem 1rem; border-radius:5px; text-decoration:none; font-weight:bold; margin-top:.5rem; transition:.3s; }
+.buy-btn:hover, .read-btn:hover { background:#004aad; color:white; cursor:pointer; }
+.more-content { display:none; padding-top:.5rem; }
+footer { background:#004aad; color:white; text-align:center; padding:1rem; margin-top:2rem; }
+footer a { color:gold; text-decoration:none; margin:0 .5rem; }
+@media(max-width:700px){ .card { flex-direction:column; } .card img { width:100%; } }
+</style>
+</head>
+<body>
+
+<header>
+<h1>TechSmartNG</h1>
+<p>Honest Reviews, Smart Choices.</p>
+</header>
+
+<nav>
+<a href="#news">News</a>
+<a href="#reviews">Reviews</a>
+<a href="#money">Money</a>
+<a href="#about">About</a>
+<a href="#contact">Contact</a>
+</nav>
+
+<section id="news">
+<h2>Latest Tech News</h2>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=60" alt="Samsung Galaxy S24 Ultra">
+<div class="card-content">
+<h3>Samsung Galaxy S24 Ultra – Camera Powerhouse</h3>
+<p>Samsung’s S24 Ultra comes with revolutionary AI camera features, improved battery life, and sleek design.</p>
+<div class="more-content">
+<p>It boasts a 200MP sensor, 100x zoom, and enhanced night mode. Rumors suggest a titanium frame and better cooling system. Early testers love its performance for gaming and photography enthusiasts alike.</p>
+</div>
+<a class="read-btn" onclick="toggleContent(this)">Read More</a>
+<a class="buy-btn" href="https://www.samsung.com/ng/smartphones/galaxy-s24-ultra/" target="_blank">Visit Site</a>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1603899123455-d6565bccc1da?auto=format&fit=crop&w=800&q=60" alt="iPhone 17 Pro">
+<div class="card-content">
+<h3>iPhone 17 Pro – Is It Worth the Hype?</h3>
+<p>Apple’s iPhone 17 Pro introduces A19 Bionic chip and titanium frame for durability.</p>
+<div class="more-content">
+<p>The device features an advanced 5-camera setup, 120Hz ProMotion display, and improved battery life. Early reviews show it excels in photography, gaming, and overall smoothness. Pricing remains high but justified for the premium experience.</p>
+</div>
+<a class="read-btn" onclick="toggleContent(this)">Read More</a>
+<a class="buy-btn" href="https://www.apple.com/iphone-17-pro/" target="_blank">Visit Site</a>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437e1?auto=format&fit=crop&w=800&q=60" alt="Infinix Zero 40">
+<div class="card-content">
+<h3>Infinix Zero 40 Launch – Budget Beast</h3>
+<p>Infinix Zero 40 offers premium features at a budget-friendly price for 2025.</p>
+<div class="more-content">
+<p>Equipped with a 200MP camera, 120W fast charging, and AMOLED display, it is gaining popularity among midrange phone buyers. Its design is sleek and battery life impressive for daily heavy usage.</p>
+</div>
+<a class="read-btn" onclick="toggleContent(this)">Read More</a>
+<a class="buy-btn" href="https://www.infinixmobility.com/" target="_blank">Visit Site</a>
+</div>
+</div>
+
+</section>
+
+<section id="reviews">
+<h2>Featured Reviews</h2>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1580910051073-8e9d9a335f2b?auto=format&fit=crop&w=800&q=60" alt="Budget Phones">
+<div class="card-content">
+<h3>Best Budget Phones Under ₦200,000</h3>
+<p>Top affordable smartphones with great cameras, performance, and battery life.</p>
+<div class="more-content">
+<p>We reviewed Tecno, Infinix, and Samsung budget models. All offer impressive specs for their price. Some feature AMOLED displays, strong AI cameras, and fast charging. Perfect for students and casual users.</p>
+</div>
+<a class="read-btn" onclick="toggleContent(this)">Read More</a>
+<a class="buy-btn" href="https://www.jumia.com.ng/" target="_blank">Shop Now</a>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1604147706283-d7115a9d49a0?auto=format&fit=crop&w=800&q=60" alt="Investment Apps">
+<div class="card-content">
+<h3>Top Investment Apps in Nigeria</h3>
+<p>PiggyVest, Bamboo, Risevest, and more helping you grow your money safely.</p>
+<div class="more-content">
+<p>These apps allow safe digital savings, stocks, and crypto investments. PiggyVest offers automated savings plans, Bamboo provides US stock access, and Risevest focuses on African and global investments. They are highly rated for security and returns.</p>
+</div>
+<a class="read-btn" onclick="toggleContent(this)">Read More</a>
+<a class="buy-btn" href="https://www.piggyvest.com/" target="_blank">Visit App</a>
+</div>
+</div>
+
+</section>
+
+<section id="money">
+<h2>Money & Finance</h2>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1606813902912-325b3fe6be85?auto=format&fit=crop&w=800&q=60" alt="Crypto">
+<div class="card-content">
+<h3>Crypto in 2025 – Worth It?</h3>
+<p>Bitcoin, Ethereum, and altcoins — what’s safe to invest in this year?</p>
+<div class="more-content">
+<p>Experts recommend diversifying and using trusted exchanges. DeFi projects are rising in Africa, offering unique opportunities. Risk management is crucial — never invest more than you can afford to lose.</p>
+</div>
+<a class="read-btn" onclick="toggleContent(this)">Read More</a>
+<a class="buy-btn" href="https://www.binance.com/en" target="_blank">Visit Site</a>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1581091012184-389d4b8b8ff7?auto=format&fit=crop&w=800&q=60" alt="Side Hustles">
+<div class="card-content">
+<h3>Top Side Hustles for Students</h3>
+<p>Earn extra money online using your phone or computer in Nigeria.</p>
+<div class="more-content">
+<p>Options include freelancing on Fiverr, Upwork, affiliate marketing, content creation, and digital tutoring. Many apps and platforms allow easy start-up with minimal cost and flexible schedules.</p>
+</div>
+<a class="read-btn" onclick="toggleContent(this)">Read More</a>
+<a class="buy-btn" href="https://www.fiverr.com/" target="_blank">Visit Site</a>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1581091012185-2a0f4fa7fc2b?auto=format&fit=crop&w=800&q=60" alt="Fintech Startups">
+<div class="card-content">
+<h3>Top Fintech Startups in Africa</h3>
+<p>Innovative companies changing the banking and finance landscape.</p>
+<div class="more-content">
+<p>Startups like Paystack, Flutterwave, Opay, and Chipper Cash are transforming payments, remittances, and financial inclusion across Africa. They offer fast, reliable services for individuals and businesses.</p>
+</div>
+<a class="read-btn" onclick="toggleContent(this)">Read More</a>
+<a class="buy-btn" href="https://www.paystack.com/" target="_blank">Visit Site</a>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1581091000802-8c10789f3146?auto=format&fit=crop&w=800&q=60" alt="Smartwatches">
+<div class="card-content">
+<h3>Best Smartwatches and Fitness Bands 2025</h3>
+<p>Track your health and notifications efficiently with these top smartwatches.</p>
+<div class="more-content">
+<p>We review Apple Watch Series 9, Samsung Galaxy Watch 6, and Fitbit Charge 6. Each device offers health monitoring, notifications, and activity tracking. Battery life varies, so choose according to your lifestyle.</p>
+</div>
+<a class="read-btn" onclick="toggleContent(this)">Read More</a>
+<a class="buy-btn" href="https://www.apple.com/watch/" target="_blank">Visit Site</a>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1581091012186-429b8fa7d5b7?auto=format&fit=crop&w=800&q=60" alt="Top Laptops">
+<div class="card-content">
+<h3>Top Laptops for Students & Professionals</h3>
+<p>Laptops with the best balance of performance and price in 2025.</p>
+<div class="more-content">
+<p>Recommended models include MacBook Air M3, HP Pavilion 15, and Lenovo Ideapad 5. Consider performance, battery life, and build quality. Affordable options are also included for budget-conscious users.</p>
+</div>
+<a class="read-btn" onclick="toggleContent(this)">Read More</a>
+<a class="buy-btn" href="https://www.apple.com/macbook-air/" target="_blank">Visit Site</a>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1581091012187-6c1d2c7b7896?auto=format&fit=crop&w=800&q=60" alt="AI Tools">
+<div class="card-content">
+<h3>Top 5 Free AI Tools That Can Make You Money</h3>
+<p>Use AI to automate work, create content, and increase productivity.</p>
+<div class="more-content">
+<p>Tools include ChatGPT, Canva AI, Copy.ai, Runway ML, and DALL·E 3. They help with content creation, marketing, image generation, and automation tasks. Most have free tiers suitable for students and small businesses.</p>
+</div>
+<a class="read-btn" onclick="toggleContent(this)">Read More</a>
+<a class="buy-btn" href="https://openai.com/chatgpt" target="_blank">Visit Site</a>
+</div>
+</div>
+
+<section id="about">
+<h2>About TechSmartNG</h2>
+<p>TechSmartNG is Nigeria’s trusted source for honest reviews, smart product choices, and the latest updates in technology, gadgets, and finance.  
+We aim to help Nigerians make informed tech and money decisions — from smartphones to investment apps. Our reviews are independent and research-based.</p>
+</section>
+
+<section id="contact">
+<h2>Contact Us</h2>
+<p>Have questions, partnership offers, or feedback? Reach us at:</p>
+<p><strong>Email:</strong> <a href="mailto:techsmartng@gmail.com">techsmartng@gmail.com</a></p>
+</section>
+
+<footer>
+<p>&copy; 2025 TechSmartNG. All rights reserved.</p>
+<p>
+<a href="#">Facebook</a> | 
+<a href="#">X (Twitter)</a> | 
+<a href="#">Instagram</a>
+</p>
+</footer>
+
+<script>
+function toggleContent(btn){
+  const more = btn.previousElementSibling;
+  if(more.style.display === "block"){
+    more.style.display = "none";
+    btn.textContent = "Read More";
+  } else {
+    more.style.display = "block";
+    btn.textContent = "Read Less";
+  }
+}
+</script>
+
+</body>
+</html>
