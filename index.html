@@ -2,274 +2,298 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>TIKI BOOST</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TIKI BOOST - Home</title>
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
-body{background:#0f0f0f;color:white;}
-/* Header */
-nav{display:flex;align-items:center;justify-content:space-between;padding:5px 15px;background:#111;position:sticky;top:0;z-index:10;height:50px;}
-.nav-left{display:flex;align-items:center;gap:5px;}
-.nav-left img{width:35px;height:35px;border-radius:5px;}
-.nav-left h2{font-size:16px;}
-.nav-center{flex:1;display:flex;justify-content:center;}
-.nav-center input{width:60%;padding:5px;border-radius:15px;border:none;text-align:center;font-size:14px;}
-.nav-right{display:flex;align-items:center;gap:10px;position:relative;}
-.coins-card{background:rgba(255,255,255,0.1);padding:5px 10px;border-radius:15px;display:flex;align-items:center;gap:5px;position:relative;cursor:pointer;font-size:14px;}
-.daily-dot{width:10px;height:10px;background:red;border-radius:50%;position:absolute;top:0;right:0;display:flex;}
-/* Top-middle start button */
-#start-button{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#ff0050;padding:5px 15px;border:none;border-radius:15px;font-size:14px;cursor:pointer;}
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#111;
+  color:#fff;
+}
 
-/* Home Content */
-#home-content{padding:10px;margin-bottom:60px;}
-.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
-.task-card{background:#161616;border-radius:15px;overflow:hidden;cursor:pointer;transition:0.3s;display:flex;flex-direction:column;box-shadow:0 2px 5px rgba(0,0,0,0.5);}
-.task-card:hover{transform:scale(1.02);box-shadow:0 0 15px #ff0050;}
-.task-thumb{height:100px;background:#333;border-radius:10px;overflow:hidden;}
-.task-thumb img{width:100%;height:100%;object-fit:cover;}
-.task-info{padding:5px;display:flex;flex-direction:column;justify-content:space-between;flex:1;}
-.task-info h4{font-size:14px;margin-bottom:3px;}
-.task-info p{font-size:12px;color:#ccc;}
-.username{font-size:10px;color:#aaa;}
+/* LOGIN */
+#login{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.login-box{
+  width:90%;
+  max-width:400px;
+  text-align:center;
+}
+.login-box input{
+  width:100%;
+  padding:14px;
+  border-radius:8px;
+  border:none;
+  margin-bottom:10px;
+}
+.login-box button{
+  width:100%;
+  padding:14px;
+  border:none;
+  background:#ff0050;
+  color:#fff;
+  border-radius:8px;
+}
 
-/* Floating + button */
-#add-post-btn{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);width:50px;height:50px;border-radius:50%;background:#ff0050;font-size:30px;color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.5);}
+/* APP */
+#app{display:none}
 
-/* Post modal */
-#post-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:20;opacity:0;pointer-events:none;transition:0.3s;}
-#post-modal.show{opacity:1;pointer-events:auto;}
-#post-content{background:#222;padding:20px;border-radius:15px;width:90%;max-width:400px;transform:translateY(-50px);transition:0.3s;}
-#post-modal.show #post-content{transform:translateY(0);}
-#post-content input,#post-content select{width:100%;margin:5px 0;padding:10px;border-radius:10px;border:none;font-size:14px;}
-#post-tabs{display:flex;gap:10px;margin-bottom:10px;}
-#post-tabs div{flex:1;text-align:center;padding:8px;border-radius:10px;cursor:pointer;background:#333;font-size:14px;}
-#post-tabs .active{background:#ff0050;}
-#history-list .history-item{background:#161616;margin:5px 0;padding:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;transition:0.3s;font-size:12px;}
-.history-item.active{border-left:5px solid green;}
-.history-item.inactive{border-left:5px solid red;}
+/* HEADER */
+header{
+  display:flex;
+  align-items:center;
+  padding:8px;
+  background:#000;
+  position:sticky;
+  top:0;
+}
+header img{width:32px}
 
-/* Coin splash */
-.coin-splash{position:absolute;font-size:18px;font-weight:bold;color:#f4b400;animation:flyCoin 1s forwards;pointer-events:none;}
-@keyframes flyCoin{0%{opacity:1;transform:translateY(0) scale(1);}50%{transform:translateY(-40px) scale(1.5);}100%{opacity:0;transform:translateY(-80px) scale(0.5);}}
+.search{
+  flex:1;
+  margin:0 8px;
+}
+.search input{
+  width:100%;
+  padding:8px;
+  border-radius:6px;
+  border:none;
+}
+
+.coins{
+  background:rgba(255,255,255,.1);
+  padding:6px 10px;
+  border-radius:8px;
+  position:relative;
+  cursor:pointer;
+}
+.dot{
+  position:absolute;
+  top:-4px;
+  right:-4px;
+  width:10px;
+  height:10px;
+  background:red;
+  border-radius:50%;
+}
+
+/* START CODE */
+.start{
+  padding:8px;
+}
+.start input{
+  width:100%;
+  padding:8px;
+  border-radius:6px;
+  border:none;
+}
+
+/* FEED */
+.feed{padding:10px}
+.card{
+  background:#1c1c1c;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:.2s;
+}
+.card:hover{transform:scale(1.02)}
+
+/* PLUS */
+.plus{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  width:60px;
+  height:60px;
+  background:#ff0050;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:36px;
+  cursor:pointer;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+.modal-box{
+  background:#222;
+  padding:20px;
+  width:90%;
+  max-width:400px;
+  border-radius:12px;
+}
+.modal-box input{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+}
+.modal-box button{
+  width:100%;
+  padding:10px;
+  border:none;
+  background:#ff0050;
+  color:white;
+  border-radius:6px;
+}
 </style>
 </head>
+
 <body>
 
-<nav>
-  <div class="nav-left">
-    <img src="https://i.ibb.co/HLHvwk7d/large-1.png" alt="TIKI BOOST">
-    <h2>TIKI BOOST</h2>
-  </div>
-  <div class="nav-center">
-    <input id="search-bar" placeholder="Search" oninput="filterTasks()">
-  </div>
-  <div class="nav-right">
-    <div class="coins-card" onclick="claimDailyBonus()">
-      🪙 <span id="coins">0</span>
-      <div class="daily-dot" id="daily-dot"></div>
-    </div>
-  </div>
-  <button id="start-button" onclick="claimStartCode()">Start</button>
-</nav>
-
-<div id="home-content">
-  <div class="task-grid" id="tasks-container"></div>
-</div>
-
-<button id="add-post-btn" onclick="openPostModal()">+</button>
-
-<!-- POST MODAL -->
-<div id="post-modal">
-  <div id="post-content">
-    <div id="post-tabs">
-      <div class="tab active" onclick="showTab('post')">Post</div>
-      <div class="tab" onclick="showTab('history')">History</div>
-    </div>
-    <div id="post-tab-content">
-      <div id="post-tab">
-        <input type="text" id="video-link" placeholder="TikTok Video or Profile Link">
-        <select id="video-type">
-          <option value="like">Like (2 🪙)</option>
-          <option value="follow">Follow (4 🪙)</option>
-        </select>
-        <select id="video-amount">
-          <option>10</option><option>20</option><option>50</option><option>100</option><option>200</option>
-        </select>
-        <input type="text" id="push-input" placeholder="Push Code (optional)">
-        <button onclick="postVideo()">Post</button>
-      </div>
-      <div id="history-tab" class="hidden">
-        <div id="history-list"></div>
-      </div>
-    </div>
-    <button style="margin-top:10px;" onclick="closePostModal()">Close</button>
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <img src="https://i.ibb.co/HLHvwk7d/large-1.png" width="70"><br><br>
+    <input id="email" placeholder="Enter your email">
+    <button onclick="login()">Continue</button>
   </div>
 </div>
 
-<audio id="coin-sound" src="https://freesound.org/data/previews/341/341695_6246770-lq.mp3"></audio>
+<!-- APP -->
+<div id="app">
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<header>
+  <img src="https://i.ibb.co/HLHvwk7d/large-1.png">
+  <div class="search"><input placeholder="Search"></div>
+  <div class="coins" onclick="dailyBonus()">
+    🪙 <span id="coinCount">0</span>
+    <div id="bonusDot" class="dot"></div>
+  </div>
+</header>
+
+<div class="start">
+  <input placeholder="Enter code & press Enter" onkeydown="codeEnter(event)">
+</div>
+
+<div class="feed" id="feed"></div>
+
+<div class="plus" onclick="openPost()">+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <input id="postLink" placeholder="Paste TikTok link">
+    <button onclick="submitPost()">Post</button>
+  </div>
+</div>
+
+</div>
 
 <script>
-// Firebase
-const firebaseConfig={apiKey:"AIzaSyDeFlOeRoiNjqH9LAclnqnehXNY6scPqzE",authDomain:"businessio-37c69.firebaseapp.com",projectId:"businessio-37c69",storageBucket:"businessio-37c69.appspot.com",messagingSenderId:"287926988132",appId:"1:287926988132:web:39c6aaf2f8994406e75e71"};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();
-const db=firebase.firestore();
+let user = localStorage.getItem("tb_user");
+let coins = 0;
+let tasks = JSON.parse(localStorage.getItem("tb_tasks")||"[]");
+let done = [];
 
-let userId=null,dailyClaimed=false,coinsCounter=0,tasksCache=[];
-
-// AUTH STATE
-auth.onAuthStateChanged(async user=>{
-  if(!user) return window.location.href="login.html";
-  userId=user.uid;
-  const userRef=db.collection('users').doc(userId);
-  if(!(await userRef.get()).exists()) await userRef.set({coins:0,history:[],lastDaily:null,username:user.email.split("@")[0]});
-  userRef.onSnapshot(snap=>{
-    const data=snap.data();
-    animateCoins(data.coins);
-    renderHistory(data.history||[]);
-    updateDailyDot(data.lastDaily);
-  });
-  loadTasks();
-});
-
-// HEADER & POST MODAL
-function openPostModal(){document.getElementById('post-modal').classList.add('show');}
-function closePostModal(){document.getElementById('post-modal').classList.remove('show');}
-function showTab(tab){document.querySelectorAll('#post-tabs .tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('#post-tab-content > div').forEach(d=>d.classList.add('hidden'));if(tab==='post'){document.querySelector('#post-tabs .tab:nth-child(1)').classList.add('active');document.getElementById('post-tab').classList.remove('hidden');}else{document.querySelector('#post-tabs .tab:nth-child(2)').classList.add('active');document.getElementById('history-tab').classList.remove('hidden');}}
-
-// POST VIDEO
-async function postVideo(){
-  let link=document.getElementById('video-link').value.trim();
-  let type=document.getElementById('video-type').value;
-  const amount=parseInt(document.getElementById('video-amount').value);
-  const pushCode=document.getElementById('push-input').value;
-  if(!link)return alert("Enter link");
-
-  // Auto-detect type based on link
-  if(link.includes("/video/")) type="like";
-  else if(link.match(/tiktok\.com\/@[\w.-]+$/)) type="follow";
-
-  const userRef=db.collection('users').doc(userId);
-  const snap=await userRef.get();
-  const history=snap.data().history||[];
-  if(history.find(h=>h.link===link)){alert("Already posted or completed.");return;}
-  const reward=type==='like'?2:4;
-  const videoId=(link.match(/video\/(\d+)/)||[])[1]||'';
-  const thumb=`https://p16-sign-va.tiktokcdn.com/obj/tos-maliva-p-0068/${videoId}_thumbnail.jpg`;
-  const docRef=await db.collection('tasks').add({link,type,remaining:amount,reward,user:userId,push:(pushCode==='Akinpepe100'),username:snap.data().username,thumb});
-  history.push({id:docRef.id,link,type,amount,active:true});
-  await userRef.update({history});
-  alert("Video posted!");
-  closePostModal();
+function login(){
+  const email = document.getElementById("email").value.trim();
+  if(!email) return alert("Enter email");
+  user=email;
+  localStorage.setItem("tb_user",email);
+  coins = Number(localStorage.getItem("coins_"+email)||0);
+  done = JSON.parse(localStorage.getItem("done_"+email)||"[]");
+  showApp();
 }
 
-// HISTORY
-function renderHistory(hist){
-  const list=document.getElementById('history-list');list.innerHTML='';
-  hist.forEach(h=>{const div=document.createElement('div');div.className='history-item '+(h.active?'active':'inactive');div.innerHTML=`<span>${h.link}</span><span>${h.type}</span>`;list.appendChild(div);});
+function showApp(){
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="block";
+  updateCoins();
+  checkDaily();
+  render();
 }
 
-// TASKS
-function loadTasks(){
-  const tasksDiv=document.getElementById('tasks-container');
-  db.collection('tasks').orderBy('push','desc').onSnapshot(snap=>{
-    tasksCache=[];
-    snap.forEach(doc=>{
-      const t=doc.data();
-      t.id=doc.id;
-      tasksCache.push(t);
-    });
-    renderTasks(tasksCache);
-  });
-}
-function renderTasks(tasks){
-  const container=document.getElementById('tasks-container');
-  container.innerHTML='';
-  tasks.forEach(t=>{
-    const div=document.createElement('div');div.className='task-card';
-    div.innerHTML=`<div class="task-thumb"><img src="${t.thumb||'https://i.ibb.co/8cFh3Jc/video-placeholder.png'}"></div>
-                   <div class="task-info"><h4>${t.type.toUpperCase()}</h4><span class="username">${t.username}</span><p>Reward: 🪙 ${t.reward}</p></div>`;
-    div.onclick=()=>claimTask(t);
-    container.appendChild(div);
-  });
+if(user){
+  coins = Number(localStorage.getItem("coins_"+user)||0);
+  done = JSON.parse(localStorage.getItem("done_"+user)||"[]");
+  showApp();
 }
 
-// CLAIM TASK WITH 3 SEC DELAY
-function claimTask(task){
-  const startTime=Date.now();
-  window.open(task.link,'_blank');
-  const timer=setInterval(async()=>{
-    if(Date.now()-startTime>=3000){
-      clearInterval(timer);
-      await db.collection('users').doc(userId).update({coins:firebase.firestore.FieldValue.increment(task.reward)});
-      coinSplash(task.reward);
-    }
-  },500);
+function updateCoins(){
+  document.getElementById("coinCount").innerText=coins;
+  localStorage.setItem("coins_"+user,coins);
 }
 
-// FILTER TASKS
-function filterTasks(){
-  const val=document.getElementById('search-bar').value.toLowerCase();
-  renderTasks(tasksCache.filter(t=>t.username.toLowerCase().includes(val)||t.link.toLowerCase().includes(val)));
-}
-
-// START BUTTON (500 coins)
-async function claimStartCode(){
-  await db.collection('users').doc(userId).update({coins:firebase.firestore.FieldValue.increment(500)});
-  coinSplash(50);
-  alert("500 🪙 added for start code!");
-}
-
-// COIN SPLASH
-function coinSplash(amount){
-  const coins=document.querySelector('.coins-card');
-  for(let i=0;i<Math.min(amount,20);i++){
-    const coin=document.createElement('div');coin.className='coin-splash';coin.innerText='🪙';
-    const rect=coins.getBoundingClientRect();
-    coin.style.left=rect.left+10+Math.random()*20+'px';
-    coin.style.top=rect.top+10+'px';
-    document.body.appendChild(coin);
-    document.getElementById('coin-sound').play();
-    setTimeout(()=>coin.remove(),1000);
+function codeEnter(e){
+  if(e.key==="Enter" && e.target.value==="Akinpepe100"){
+    coins+=500;
+    updateCoins();
+    alert("+500 coins");
+    e.target.value="";
   }
 }
 
-// SMOOTH COIN COUNTER
-function animateCoins(newAmount){
-  const el=document.getElementById('coins');
-  let start=coinsCounter,end=newAmount;
-  let diff=end-start;
-  if(diff===0) return;
-  let step=Math.ceil(diff/20);
-  const interval=setInterval(()=>{
-    start+=step;
-    if(start>=end){start=end;clearInterval(interval);}
-    el.innerText=start;
-    coinsCounter=start;
-  },30);
+function dailyBonus(){
+  const today=new Date().toDateString();
+  if(localStorage.getItem("daily_"+user)===today) return;
+  const rewards=[5,10,15,20,30,50];
+  const gain=rewards[Math.floor(Math.random()*rewards.length)];
+  coins+=gain;
+  updateCoins();
+  localStorage.setItem("daily_"+user,today);
+  document.getElementById("bonusDot").style.display="none";
+  alert("+"+gain+" coins");
 }
 
-// DAILY BONUS
-function updateDailyDot(lastDaily){
-  const dot=document.getElementById('daily-dot');
+function checkDaily(){
   const today=new Date().toDateString();
-  dailyClaimed=lastDaily===today;
-  dot.style.display=dailyClaimed?'none':'flex';
+  if(localStorage.getItem("daily_"+user)!==today){
+    document.getElementById("bonusDot").style.display="block";
+  }
 }
-async function claimDailyBonus(){
-  if(dailyClaimed)return;
-  const options=[5,10,15,20,30,50];
-  const reward=options[Math.floor(Math.random()*options.length)];
-  await window.open('https://www.effectivegatecpm.com/prwmz1t9?key=17b80b2cde4a338414105a2c5427f8ce','_blank');
-  await db.collection('users').doc(userId).update({coins:firebase.firestore.FieldValue.increment(reward), lastDaily:new Date().toDateString()});
-  dailyClaimed=true;
-  document.getElementById('daily-dot').style.display='none';
-  alert(`🪙 ${reward} Daily Bonus Claimed!`);
+
+function openPost(){
+  document.getElementById("modal").style.display="flex";
+}
+
+function submitPost(){
+  const link=document.getElementById("postLink").value;
+  if(!link) return;
+  const type=link.includes("/video/")?"like":"follow";
+  tasks.unshift({link,type});
+  localStorage.setItem("tb_tasks",JSON.stringify(tasks));
+  document.getElementById("modal").style.display="none";
+  render();
+}
+
+function render(){
+  const feed=document.getElementById("feed");
+  feed.innerHTML="";
+  tasks.forEach(t=>{
+    if(done.includes(t.link)) return;
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`${t.type.toUpperCase()}<br>${t.link}`;
+    card.onclick=()=>{
+      window.open(t.link,"_blank");
+      setTimeout(()=>{
+        coins+=t.type==="like"?2:4;
+        done.push(t.link);
+        localStorage.setItem("done_"+user,JSON.stringify(done));
+        updateCoins();
+        render();
+      },3000);
+    };
+    feed.appendChild(card);
+  });
 }
 </script>
+
 </body>
 </html>
