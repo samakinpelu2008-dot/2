@@ -1,298 +1,181 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>TIKI BOOST</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#111;
-  color:#fff;
-}
-
-/* LOGIN */
-#login{
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.login-box{
-  width:90%;
-  max-width:400px;
-  text-align:center;
-}
-.login-box input{
-  width:100%;
-  padding:14px;
-  border-radius:8px;
-  border:none;
-  margin-bottom:10px;
-}
-.login-box button{
-  width:100%;
-  padding:14px;
-  border:none;
-  background:#ff0050;
-  color:#fff;
-  border-radius:8px;
-}
-
-/* APP */
-#app{display:none}
-
-/* HEADER */
+body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff}
 header{
-  display:flex;
-  align-items:center;
-  padding:8px;
-  background:#000;
-  position:sticky;
-  top:0;
+  display:flex;align-items:center;
+  padding:10px;background:#000;
+  position:sticky;top:0;z-index:10
 }
 header img{width:32px}
-
-.search{
-  flex:1;
-  margin:0 8px;
-}
+.search{flex:1;margin:0 10px}
 .search input{
-  width:100%;
-  padding:8px;
-  border-radius:6px;
-  border:none;
+  width:100%;padding:8px;border:none;
+  border-radius:8px;background:#222;color:#fff
 }
+.coins{padding:6px 12px;background:#222;border-radius:8px;position:relative;cursor:pointer}
+.dot{width:10px;height:10px;background:red;border-radius:50%;position:absolute;top:-4px;right:-4px}
 
-.coins{
-  background:rgba(255,255,255,.1);
-  padding:6px 10px;
-  border-radius:8px;
-  position:relative;
-  cursor:pointer;
+.tabs{
+  display:flex;justify-content:space-around;
+  background:#000;padding:6px 0
 }
-.dot{
-  position:absolute;
-  top:-4px;
-  right:-4px;
-  width:10px;
-  height:10px;
-  background:red;
-  border-radius:50%;
-}
+.tabs div{cursor:pointer;opacity:.6}
+.tabs .active{opacity:1}
 
-/* START CODE */
-.start{
-  padding:8px;
-}
-.start input{
-  width:100%;
-  padding:8px;
-  border-radius:6px;
-  border:none;
-}
-
-/* FEED */
 .feed{padding:10px}
 .card{
-  background:#1c1c1c;
-  padding:12px;
-  border-radius:10px;
+  display:flex;align-items:center;
+  background:#1b1b1b;
+  padding:10px;border-radius:12px;
   margin-bottom:10px;
-  cursor:pointer;
-  transition:.2s;
+  transition:.2s
 }
 .card:hover{transform:scale(1.02)}
-
-/* PLUS */
+.thumb{
+  width:50px;height:50px;border-radius:50%;
+  background:#333;margin-right:10px
+}
+.info b{display:block}
 .plus{
-  position:fixed;
-  bottom:20px;
-  left:50%;
+  position:fixed;bottom:20px;left:50%;
   transform:translateX(-50%);
-  width:60px;
-  height:60px;
+  width:60px;height:60px;border-radius:50%;
   background:#ff0050;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:36px;
-  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;cursor:pointer
 }
 
-/* MODAL */
 .modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.7);
-  display:none;
-  align-items:center;
-  justify-content:center;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.8);
+  display:none;align-items:center;justify-content:center
 }
-.modal-box{
-  background:#222;
-  padding:20px;
-  width:90%;
-  max-width:400px;
-  border-radius:12px;
+.box{
+  width:90%;max-width:400px;
+  background:#222;padding:20px;
+  border-radius:12px
 }
-.modal-box input{
-  width:100%;
-  padding:10px;
-  margin-bottom:10px;
+.box input,.box select{
+  width:100%;padding:10px;margin-bottom:10px;
+  background:#111;color:#fff;border:none;border-radius:6px
 }
-.modal-box button{
-  width:100%;
-  padding:10px;
-  border:none;
-  background:#ff0050;
-  color:white;
-  border-radius:6px;
+.box button{
+  width:100%;padding:10px;
+  background:#ff0050;border:none;
+  color:#fff;border-radius:6px
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="login">
-  <div class="login-box">
-    <img src="https://i.ibb.co/HLHvwk7d/large-1.png" width="70"><br><br>
-    <input id="email" placeholder="Enter your email">
-    <button onclick="login()">Continue</button>
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app">
-
 <header>
   <img src="https://i.ibb.co/HLHvwk7d/large-1.png">
   <div class="search"><input placeholder="Search"></div>
-  <div class="coins" onclick="dailyBonus()">
-    🪙 <span id="coinCount">0</span>
-    <div id="bonusDot" class="dot"></div>
+  <div class="coins" onclick="daily()">
+    🪙 <span id="coins">0</span>
+    <div id="dot" class="dot"></div>
   </div>
 </header>
 
-<div class="start">
-  <input placeholder="Enter code & press Enter" onkeydown="codeEnter(event)">
+<div class="tabs">
+  <div class="active" onclick="tab('home')">Home</div>
+  <div onclick="tab('history')">History</div>
+  <div onclick="tab('profile')">Profile</div>
 </div>
 
-<div class="feed" id="feed"></div>
+<div id="home" class="feed"></div>
+<div id="history" class="feed" style="display:none"></div>
+<div id="profile" class="feed" style="display:none"></div>
 
 <div class="plus" onclick="openPost()">+</div>
 
 <div class="modal" id="modal">
-  <div class="modal-box">
-    <input id="postLink" placeholder="Paste TikTok link">
-    <button onclick="submitPost()">Post</button>
+  <div class="box">
+    <input id="link" placeholder="Paste TikTok link">
+    <input placeholder="Promo code (optional)">
+    <select id="qty">
+      <option>10</option><option>20</option><option>50</option>
+      <option>100</option><option>200</option><option>500</option><option>1000</option>
+    </select>
+    <button onclick="post()">Next</button>
   </div>
 </div>
 
-</div>
-
 <script>
-let user = localStorage.getItem("tb_user");
-let coins = 0;
-let tasks = JSON.parse(localStorage.getItem("tb_tasks")||"[]");
-let done = [];
+let coins=+localStorage.coins||0;
+let tasks=JSON.parse(localStorage.tasks||"[]");
+let done=JSON.parse(localStorage.done||"[]");
+document.getElementById("coins").innerText=coins;
 
-function login(){
-  const email = document.getElementById("email").value.trim();
-  if(!email) return alert("Enter email");
-  user=email;
-  localStorage.setItem("tb_user",email);
-  coins = Number(localStorage.getItem("coins_"+email)||0);
-  done = JSON.parse(localStorage.getItem("done_"+email)||"[]");
-  showApp();
+function save(){
+  localStorage.coins=coins;
+  localStorage.tasks=JSON.stringify(tasks);
+  localStorage.done=JSON.stringify(done);
+  document.getElementById("coins").innerText=coins;
 }
 
-function showApp(){
-  document.getElementById("login").style.display="none";
-  document.getElementById("app").style.display="block";
-  updateCoins();
-  checkDaily();
-  render();
+function daily(){
+  if(localStorage.daily==new Date().toDateString())return;
+  window.open("https://www.effectivegatecpm.com/prwmz1t9?key=17b80b2cde4a338414105a2c5427f8ce","_blank");
+  setTimeout(()=>{
+    let r=[5,10,20,30,50][Math.floor(Math.random()*5)];
+    coins+=r;save();
+    localStorage.daily=new Date().toDateString();
+    document.getElementById("dot").style.display="none";
+    alert("+"+r+" coins");
+  },3000);
 }
+if(localStorage.daily!==new Date().toDateString())
+  document.getElementById("dot").style.display="block";
 
-if(user){
-  coins = Number(localStorage.getItem("coins_"+user)||0);
-  done = JSON.parse(localStorage.getItem("done_"+user)||"[]");
-  showApp();
-}
-
-function updateCoins(){
-  document.getElementById("coinCount").innerText=coins;
-  localStorage.setItem("coins_"+user,coins);
-}
-
-function codeEnter(e){
-  if(e.key==="Enter" && e.target.value==="Akinpepe100"){
-    coins+=500;
-    updateCoins();
-    alert("+500 coins");
-    e.target.value="";
-  }
-}
-
-function dailyBonus(){
-  const today=new Date().toDateString();
-  if(localStorage.getItem("daily_"+user)===today) return;
-  const rewards=[5,10,15,20,30,50];
-  const gain=rewards[Math.floor(Math.random()*rewards.length)];
-  coins+=gain;
-  updateCoins();
-  localStorage.setItem("daily_"+user,today);
-  document.getElementById("bonusDot").style.display="none";
-  alert("+"+gain+" coins");
-}
-
-function checkDaily(){
-  const today=new Date().toDateString();
-  if(localStorage.getItem("daily_"+user)!==today){
-    document.getElementById("bonusDot").style.display="block";
-  }
-}
-
-function openPost(){
-  document.getElementById("modal").style.display="flex";
-}
-
-function submitPost(){
-  const link=document.getElementById("postLink").value;
-  if(!link) return;
-  const type=link.includes("/video/")?"like":"follow";
-  tasks.unshift({link,type});
-  localStorage.setItem("tb_tasks",JSON.stringify(tasks));
-  document.getElementById("modal").style.display="none";
-  render();
+function openPost(){modal.style.display="flex"}
+function post(){
+  let l=link.value;if(!l)return;
+  let type=l.includes("/video/")?"LIKE":"FOLLOW";
+  tasks.unshift({l,type,q:+qty.value});
+  save();modal.style.display="none";render();
 }
 
 function render(){
-  const feed=document.getElementById("feed");
-  feed.innerHTML="";
+  home.innerHTML="";
+  history.innerHTML="";
+  profile.innerHTML=`<h2>Coins: ${coins}</h2><p>Completed: ${done.length}</p>`;
   tasks.forEach(t=>{
-    if(done.includes(t.link)) return;
-    const card=document.createElement("div");
-    card.className="card";
-    card.innerHTML=`${t.type.toUpperCase()}<br>${t.link}`;
-    card.onclick=()=>{
-      window.open(t.link,"_blank");
+    if(done.includes(t.l))return;
+    let c=document.createElement("div");
+    c.className="card";
+    c.innerHTML=`<div class="thumb"></div>
+    <div class="info"><b>${t.type}</b>${t.q} required</div>`;
+    c.onclick=()=>{
+      window.open(t.l,"_blank");
       setTimeout(()=>{
-        coins+=t.type==="like"?2:4;
-        done.push(t.link);
-        localStorage.setItem("done_"+user,JSON.stringify(done));
-        updateCoins();
-        render();
+        coins+=t.type=="LIKE"?2:4;
+        done.push(t.l);save();render();
       },3000);
     };
-    feed.appendChild(card);
+    home.appendChild(c);
+  });
+  done.forEach(l=>{
+    let c=document.createElement("div");
+    c.className="card";
+    c.innerHTML=`<div class="thumb"></div><div>Completed</div>`;
+    history.appendChild(c);
   });
 }
+function tab(t){
+  home.style.display=history.style.display=profile.style.display="none";
+  document.getElementById(t).style.display="block";
+  document.querySelectorAll(".tabs div").forEach(x=>x.classList.remove("active"));
+  event.target.classList.add("active");
+}
+render();
 </script>
 
 </body>
