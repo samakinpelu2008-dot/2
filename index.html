@@ -7,37 +7,50 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
 body{background:#0f0f0f;color:white;}
-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#111;position:sticky;top:0;z-index:10;}
-.nav-left{display:flex;align-items:center;gap:10px;}
-.nav-left img{width:50px;height:50px;border-radius:10px;}
+/* Header */
+nav{display:flex;align-items:center;justify-content:space-between;padding:5px 15px;background:#111;position:sticky;top:0;z-index:10;height:50px;}
+.nav-left{display:flex;align-items:center;gap:5px;}
+.nav-left img{width:35px;height:35px;border-radius:5px;}
+.nav-left h2{font-size:16px;}
 .nav-center{flex:1;display:flex;justify-content:center;}
-.nav-center input{width:60%;padding:8px;border-radius:20px;border:none;text-align:center;}
-.nav-right{display:flex;align-items:center;gap:15px;position:relative;}
-.coins-card{background:rgba(255,255,255,0.1);padding:5px 15px;border-radius:20px;display:flex;align-items:center;gap:5px;position:relative;cursor:pointer;}
-.daily-dot{width:12px;height:12px;background:red;border-radius:50%;position:absolute;top:0;right:0;display:flex;}
-#home-content{padding:20px;}
-.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px;}
-.task-card{background:#161616;border-radius:15px;overflow:hidden;cursor:pointer;transition:0.3s;box-shadow:0 2px 8px rgba(0,0,0,0.5);display:flex;flex-direction:column;}
+.nav-center input{width:60%;padding:5px;border-radius:15px;border:none;text-align:center;font-size:14px;}
+.nav-right{display:flex;align-items:center;gap:10px;position:relative;}
+.coins-card{background:rgba(255,255,255,0.1);padding:5px 10px;border-radius:15px;display:flex;align-items:center;gap:5px;position:relative;cursor:pointer;font-size:14px;}
+.daily-dot{width:10px;height:10px;background:red;border-radius:50%;position:absolute;top:0;right:0;display:flex;}
+/* Top-middle start button */
+#start-button{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#ff0050;padding:5px 15px;border:none;border-radius:15px;font-size:14px;cursor:pointer;}
+
+/* Home Content */
+#home-content{padding:10px;margin-bottom:60px;}
+.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+.task-card{background:#161616;border-radius:15px;overflow:hidden;cursor:pointer;transition:0.3s;display:flex;flex-direction:column;box-shadow:0 2px 5px rgba(0,0,0,0.5);}
 .task-card:hover{transform:scale(1.02);box-shadow:0 0 15px #ff0050;}
-.task-thumb{height:120px;background:#333;border-radius:10px;overflow:hidden;}
+.task-thumb{height:100px;background:#333;border-radius:10px;overflow:hidden;}
 .task-thumb img{width:100%;height:100%;object-fit:cover;}
-.task-info{padding:10px;display:flex;flex-direction:column;justify-content:space-between;flex:1;}
-.task-info h4{font-size:16px;}
-.task-info p{font-size:14px;color:#ccc;}
-.username{font-size:12px;color:#aaa;}
+.task-info{padding:5px;display:flex;flex-direction:column;justify-content:space-between;flex:1;}
+.task-info h4{font-size:14px;margin-bottom:3px;}
+.task-info p{font-size:12px;color:#ccc;}
+.username{font-size:10px;color:#aaa;}
+
+/* Floating + button */
+#add-post-btn{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);width:50px;height:50px;border-radius:50%;background:#ff0050;font-size:30px;color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.5);}
+
+/* Post modal */
 #post-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:20;opacity:0;pointer-events:none;transition:0.3s;}
 #post-modal.show{opacity:1;pointer-events:auto;}
 #post-content{background:#222;padding:20px;border-radius:15px;width:90%;max-width:400px;transform:translateY(-50px);transition:0.3s;}
 #post-modal.show #post-content{transform:translateY(0);}
-#post-content input,#post-content select{width:100%;margin:5px 0;padding:10px;border-radius:10px;border:none;}
+#post-content input,#post-content select{width:100%;margin:5px 0;padding:10px;border-radius:10px;border:none;font-size:14px;}
 #post-tabs{display:flex;gap:10px;margin-bottom:10px;}
-#post-tabs div{flex:1;text-align:center;padding:8px;border-radius:10px;cursor:pointer;background:#333;}
+#post-tabs div{flex:1;text-align:center;padding:8px;border-radius:10px;cursor:pointer;background:#333;font-size:14px;}
 #post-tabs .active{background:#ff0050;}
-#history-list .history-item{background:#161616;margin:5px 0;padding:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;transition:0.3s;}
+#history-list .history-item{background:#161616;margin:5px 0;padding:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;transition:0.3s;font-size:12px;}
 .history-item.active{border-left:5px solid green;}
 .history-item.inactive{border-left:5px solid red;}
-.coin-splash{position:absolute;font-size:20px;font-weight:bold;color:#f4b400;animation:flyCoin 1s forwards;pointer-events:none;}
-@keyframes flyCoin{0%{opacity:1;transform:translateY(0) scale(1);}50%{transform:translateY(-50px) scale(1.5);}100%{opacity:0;transform:translateY(-100px) scale(0.5);}}
+
+/* Coin splash */
+.coin-splash{position:absolute;font-size:18px;font-weight:bold;color:#f4b400;animation:flyCoin 1s forwards;pointer-events:none;}
+@keyframes flyCoin{0%{opacity:1;transform:translateY(0) scale(1);}50%{transform:translateY(-40px) scale(1.5);}100%{opacity:0;transform:translateY(-80px) scale(0.5);}}
 </style>
 </head>
 <body>
@@ -55,13 +68,15 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:10px 2
       🪙 <span id="coins">0</span>
       <div class="daily-dot" id="daily-dot"></div>
     </div>
-    <button onclick="openPostModal()">+</button>
   </div>
+  <button id="start-button" onclick="claimStartCode()">Start</button>
 </nav>
 
 <div id="home-content">
   <div class="task-grid" id="tasks-container"></div>
 </div>
+
+<button id="add-post-btn" onclick="openPostModal()">+</button>
 
 <!-- POST MODAL -->
 <div id="post-modal">
@@ -72,7 +87,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:10px 2
     </div>
     <div id="post-tab-content">
       <div id="post-tab">
-        <input type="text" id="video-link" placeholder="TikTok Video Link">
+        <input type="text" id="video-link" placeholder="TikTok Video or Profile Link">
         <select id="video-type">
           <option value="like">Like (2 🪙)</option>
           <option value="follow">Follow (4 🪙)</option>
@@ -128,11 +143,16 @@ function showTab(tab){document.querySelectorAll('#post-tabs .tab').forEach(t=>t.
 
 // POST VIDEO
 async function postVideo(){
-  const link=document.getElementById('video-link').value;
-  const type=document.getElementById('video-type').value;
+  let link=document.getElementById('video-link').value.trim();
+  let type=document.getElementById('video-type').value;
   const amount=parseInt(document.getElementById('video-amount').value);
   const pushCode=document.getElementById('push-input').value;
   if(!link)return alert("Enter link");
+
+  // Auto-detect type based on link
+  if(link.includes("/video/")) type="like";
+  else if(link.match(/tiktok\.com\/@[\w.-]+$/)) type="follow";
+
   const userRef=db.collection('users').doc(userId);
   const snap=await userRef.get();
   const history=snap.data().history||[];
@@ -178,7 +198,7 @@ function renderTasks(tasks){
   });
 }
 
-// TASK CLAIM WITH 3 SEC DELAY
+// CLAIM TASK WITH 3 SEC DELAY
 function claimTask(task){
   const startTime=Date.now();
   window.open(task.link,'_blank');
@@ -195,6 +215,13 @@ function claimTask(task){
 function filterTasks(){
   const val=document.getElementById('search-bar').value.toLowerCase();
   renderTasks(tasksCache.filter(t=>t.username.toLowerCase().includes(val)||t.link.toLowerCase().includes(val)));
+}
+
+// START BUTTON (500 coins)
+async function claimStartCode(){
+  await db.collection('users').doc(userId).update({coins:firebase.firestore.FieldValue.increment(500)});
+  coinSplash(50);
+  alert("500 🪙 added for start code!");
 }
 
 // COIN SPLASH
@@ -235,11 +262,13 @@ function updateDailyDot(lastDaily){
 }
 async function claimDailyBonus(){
   if(dailyClaimed)return;
+  const options=[5,10,15,20,30,50];
+  const reward=options[Math.floor(Math.random()*options.length)];
   await window.open('https://www.effectivegatecpm.com/prwmz1t9?key=17b80b2cde4a338414105a2c5427f8ce','_blank');
-  await db.collection('users').doc(userId).update({coins:firebase.firestore.FieldValue.increment(100), lastDaily:new Date().toDateString()});
+  await db.collection('users').doc(userId).update({coins:firebase.firestore.FieldValue.increment(reward), lastDaily:new Date().toDateString()});
   dailyClaimed=true;
   document.getElementById('daily-dot').style.display='none';
-  alert("🪙 100 Daily Bonus Claimed!");
+  alert(`🪙 ${reward} Daily Bonus Claimed!`);
 }
 </script>
 </body>
