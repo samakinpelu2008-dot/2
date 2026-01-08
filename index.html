@@ -8,26 +8,31 @@
 *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
 body{background:#0f0f0f;color:white;overflow-x:hidden;}
 .hidden{display:none;}
+/* LOGIN PAGE */
+#login-page{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;}
+#login-page input{padding:10px 15px;border-radius:10px;border:none;width:250px;}
+#login-page button{padding:10px 20px;border:none;border-radius:10px;background:#ff0050;color:white;cursor:pointer;}
+/* HEADER */
 nav{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#111;position:sticky;top:0;z-index:10;}
 .nav-left{display:flex;align-items:center;gap:10px;}
 .nav-left img{width:50px;height:50px;border-radius:10px;}
 .nav-center{flex:1;display:flex;justify-content:center;}
 .nav-center input{width:60%;padding:8px;border-radius:20px;border:none;text-align:center;}
 .nav-right{display:flex;align-items:center;gap:15px;position:relative;}
-.coins-card{background:rgba(255,255,255,0.1);padding:5px 15px;border-radius:20px;display:flex;align-items:center;gap:5px;position:relative;}
-.daily-bonus{width:30px;height:30px;background:red;border-radius:50%;text-align:center;line-height:30px;cursor:pointer;font-weight:bold;position:absolute;top:-10px;right:-10px;display:flex;justify-content:center;align-items:center;}
-#login-page{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;}
-#login-page input{padding:10px 15px;border-radius:10px;border:none;width:250px;}
-#login-page button{padding:10px 20px;border:none;border-radius:10px;background:#ff0050;color:white;cursor:pointer;}
+.coins-card{background:rgba(255,255,255,0.1);padding:5px 15px;border-radius:20px;display:flex;align-items:center;gap:5px;position:relative;cursor:pointer;}
+.daily-dot{width:12px;height:12px;background:red;border-radius:50%;position:absolute;top:0;right:0;display:flex;}
+/* HOME PAGE */
 #home-page{padding:20px;}
-.task-card{display:flex;background:#161616;border-radius:15px;margin:10px 0;overflow:hidden;cursor:pointer;transition:0.3s;box-shadow:0 2px 8px rgba(0,0,0,0.5);position:relative;touch-action:pan-y;}
+.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px;}
+.task-card{background:#161616;border-radius:15px;overflow:hidden;cursor:pointer;transition:0.3s;box-shadow:0 2px 8px rgba(0,0,0,0.5);display:flex;flex-direction:column;}
 .task-card:hover{transform:scale(1.02);box-shadow:0 0 15px #ff0050;}
-.task-thumb{width:120px;height:120px;background:#333;border-radius:10px;flex-shrink:0;overflow:hidden;}
+.task-thumb{height:120px;background:#333;border-radius:10px;overflow:hidden;}
 .task-thumb img{width:100%;height:100%;object-fit:cover;}
 .task-info{padding:10px;display:flex;flex-direction:column;justify-content:space-between;flex:1;}
 .task-info h4{font-size:16px;}
 .task-info p{font-size:14px;color:#ccc;}
 .username{font-size:12px;color:#aaa;}
+/* POST MODAL */
 #post-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:20;opacity:0;pointer-events:none;transition:0.3s;}
 #post-modal.show{opacity:1;pointer-events:auto;}
 #post-content{background:#222;padding:20px;border-radius:15px;width:90%;max-width:400px;transform:translateY(-50px);transition:0.3s;}
@@ -39,18 +44,21 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:10px 2
 #history-list .history-item{background:#161616;margin:5px 0;padding:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;transition:0.3s;}
 .history-item.active{border-left:5px solid green;}
 .history-item.inactive{border-left:5px solid red;}
+/* COIN SPLASH */
 .coin-splash{position:absolute;font-size:20px;font-weight:bold;color:#f4b400;animation:flyCoin 1s forwards;pointer-events:none;}
 @keyframes flyCoin{0%{opacity:1;transform:translateY(0) scale(1);}50%{transform:translateY(-50px) scale(1.5);}100%{opacity:0;transform:translateY(-100px) scale(0.5);}}
 </style>
 </head>
 <body>
 
+<!-- LOGIN PAGE -->
 <div id="login-page">
   <h1>TIKI BOOST</h1>
   <input type="email" id="email-login" placeholder="Enter your email">
   <button onclick="login()">Continue</button>
 </div>
 
+<!-- HOME PAGE -->
 <div id="home-page" class="hidden">
   <nav>
     <div class="nav-left">
@@ -58,17 +66,21 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:10px 2
       <h2>TIKI BOOST</h2>
     </div>
     <div class="nav-center">
-      <input id="push-code" placeholder="" readonly>
+      <input id="search-bar" placeholder="Search" oninput="filterTasks()">
     </div>
     <div class="nav-right">
-      <div class="coins-card">🪙 <span id="coins">0</span></div>
-      <div class="daily-bonus" id="daily-bonus">!</div>
+      <div class="coins-card" onclick="claimDailyBonus()">
+        🪙 <span id="coins">0</span>
+        <div class="daily-dot" id="daily-dot"></div>
+      </div>
       <button style="margin-left:10px;" onclick="openPostModal()">+</button>
     </div>
   </nav>
-  <div id="tasks-container"></div>
+
+  <div class="task-grid" id="tasks-container"></div>
 </div>
 
+<!-- POST MODAL -->
 <div id="post-modal">
   <div id="post-content">
     <div id="post-tabs">
@@ -109,15 +121,16 @@ firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();
 const db=firebase.firestore();
 
-let userId=null,dailyClaimed=false;
-let coinsCounter=0;
+let userId=null,dailyClaimed=false,coinsCounter=0,tasksCache=[];
 
-// Login
+// LOGIN
 function login(){
   const email=document.getElementById('email-login').value;
+  if(!email)return alert("Enter email");
   auth.signInWithEmailAndPassword(email,"123456").catch(()=>auth.createUserWithEmailAndPassword(email,"123456"));
 }
 
+// AUTH STATE
 auth.onAuthStateChanged(async user=>{
   if(!user) return;
   userId=user.uid;
@@ -129,22 +142,23 @@ auth.onAuthStateChanged(async user=>{
     const data=snap.data();
     animateCoins(data.coins);
     renderHistory(data.history||[]);
-    checkDailyBonus(data.lastDaily);
+    updateDailyDot(data.lastDaily);
   });
   loadTasks();
 });
 
-// Modal
+// HEADER & POST MODAL
 function openPostModal(){document.getElementById('post-modal').classList.add('show');}
 function closePostModal(){document.getElementById('post-modal').classList.remove('show');}
 function showTab(tab){document.querySelectorAll('#post-tabs .tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('#post-tab-content > div').forEach(d=>d.classList.add('hidden'));if(tab==='post'){document.querySelector('#post-tabs .tab:nth-child(1)').classList.add('active');document.getElementById('post-tab').classList.remove('hidden');}else{document.querySelector('#post-tabs .tab:nth-child(2)').classList.add('active');document.getElementById('history-tab').classList.remove('hidden');}}
 
-// Post video
+// POST VIDEO
 async function postVideo(){
   const link=document.getElementById('video-link').value;
   const type=document.getElementById('video-type').value;
   const amount=parseInt(document.getElementById('video-amount').value);
   const pushCode=document.getElementById('push-input').value;
+  if(!link)return alert("Enter link");
   const userRef=db.collection('users').doc(userId);
   const snap=await userRef.get();
   const history=snap.data().history||[];
@@ -159,61 +173,57 @@ async function postVideo(){
   closePostModal();
 }
 
-// Render history
+// HISTORY
 function renderHistory(hist){
   const list=document.getElementById('history-list');list.innerHTML='';
   hist.forEach(h=>{const div=document.createElement('div');div.className='history-item '+(h.active?'active':'inactive');div.innerHTML=`<span>${h.link}</span><span>${h.type}</span>`;list.appendChild(div);});
 }
 
-// Load tasks with swipe gestures
+// TASKS
 function loadTasks(){
   const tasksDiv=document.getElementById('tasks-container');
   db.collection('tasks').orderBy('push','desc').onSnapshot(snap=>{
-    tasksDiv.innerHTML='';
+    tasksCache=[];
     snap.forEach(doc=>{
       const t=doc.data();
-      const div=document.createElement('div');div.className='task-card';
-      div.innerHTML=`<div class="task-thumb"><img src="${t.thumb||'https://i.ibb.co/8cFh3Jc/video-placeholder.png'}"></div>
-                     <div class="task-info"><h4>${t.type.toUpperCase()}</h4><span class="username">${t.username}</span><p>Reward: 🪙 ${t.reward}</p></div>`;
-      // Swipe gesture
-      let startX=0,offsetX=0;
-      div.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;});
-      div.addEventListener('touchmove',e=>{offsetX=e.touches[0].clientX-startX;div.style.transform=`translateX(${offsetX}px) rotate(${offsetX/10}deg)`;});
-      div.addEventListener('touchend',async ()=>{
-        if(Math.abs(offsetX)>100){
-          div.style.transition="transform 0.5s ease-out,opacity 0.5s ease-out";
-          div.style.transform=`translateX(${offsetX>0?500:-500}px) rotate(${offsetX>0?20:-20}deg)`;
-          div.style.opacity="0";
-          window.open(t.link,'_blank');
-          await db.collection('users').doc(userId).update({coins:firebase.firestore.FieldValue.increment(t.reward)});
-          coinSplash(t.reward);
-          const taskRef=db.collection('tasks').doc(doc.id);
-          if(t.remaining-1<=0) await taskRef.delete();
-          else await taskRef.update({remaining:firebase.firestore.FieldValue.increment(-1)});
-          setTimeout(()=>div.remove(),500);
-        }else{
-          div.style.transition="transform 0.3s ease-out";
-          div.style.transform="translateX(0) rotate(0)";
-        }
-      });
-      div.onclick=async ()=>{
-        div.style.transition="transform 0.5s ease-out,opacity 0.5s ease-out";
-        div.style.transform="translateX(500px) rotate(20deg)";
-        div.style.opacity="0";
-        window.open(t.link,'_blank');
-        await db.collection('users').doc(userId).update({coins:firebase.firestore.FieldValue.increment(t.reward)});
-        coinSplash(t.reward);
-        const taskRef=db.collection('tasks').doc(doc.id);
-        if(t.remaining-1<=0) await taskRef.delete();
-        else await taskRef.update({remaining:firebase.firestore.FieldValue.increment(-1)});
-        setTimeout(()=>div.remove(),500);
-      };
-      tasksDiv.appendChild(div);
+      t.id=doc.id;
+      tasksCache.push(t);
     });
+    renderTasks(tasksCache);
+  });
+}
+function renderTasks(tasks){
+  const container=document.getElementById('tasks-container');
+  container.innerHTML='';
+  tasks.forEach(t=>{
+    const div=document.createElement('div');div.className='task-card';
+    div.innerHTML=`<div class="task-thumb"><img src="${t.thumb||'https://i.ibb.co/8cFh3Jc/video-placeholder.png'}"></div>
+                   <div class="task-info"><h4>${t.type.toUpperCase()}</h4><span class="username">${t.username}</span><p>Reward: 🪙 ${t.reward}</p></div>`;
+    div.onclick=()=>claimTask(t);
+    container.appendChild(div);
   });
 }
 
-// Coin splash
+// TASK CLAIM WITH 3 SEC DELAY
+function claimTask(task){
+  const startTime=Date.now();
+  window.open(task.link,'_blank');
+  const timer=setInterval(async()=>{
+    if(Date.now()-startTime>=3000){
+      clearInterval(timer);
+      await db.collection('users').doc(userId).update({coins:firebase.firestore.FieldValue.increment(task.reward)});
+      coinSplash(task.reward);
+    }
+  },500);
+}
+
+// FILTER TASKS
+function filterTasks(){
+  const val=document.getElementById('search-bar').value.toLowerCase();
+  renderTasks(tasksCache.filter(t=>t.username.toLowerCase().includes(val)||t.link.toLowerCase().includes(val)));
+}
+
+// COIN SPLASH
 function coinSplash(amount){
   const coins=document.querySelector('.coins-card');
   for(let i=0;i<Math.min(amount,20);i++){
@@ -227,7 +237,7 @@ function coinSplash(amount){
   }
 }
 
-// Smooth coins counter
+// SMOOTH COIN COUNTER
 function animateCoins(newAmount){
   const el=document.getElementById('coins');
   let start=coinsCounter,end=newAmount;
@@ -242,13 +252,21 @@ function animateCoins(newAmount){
   },30);
 }
 
-// Daily bonus
-document.getElementById('daily-bonus').onclick=async ()=>{
+// DAILY BONUS
+function updateDailyDot(lastDaily){
+  const dot=document.getElementById('daily-dot');
+  const today=new Date().toDateString();
+  dailyClaimed=lastDaily===today;
+  dot.style.display=dailyClaimed?'none':'flex';
+}
+async function claimDailyBonus(){
+  if(dailyClaimed)return;
   await window.open('https://www.effectivegatecpm.com/prwmz1t9?key=17b80b2cde4a338414105a2c5427f8ce','_blank');
   await db.collection('users').doc(userId).update({coins:firebase.firestore.FieldValue.increment(100), lastDaily:new Date().toDateString()});
-  alert("🪙 100 Daily Bonus Claimed!");dailyClaimed=true;
-};
-function checkDailyBonus(lastDaily){const today=new Date().toDateString();dailyClaimed=lastDaily===today;document.getElementById('daily-bonus').style.display=dailyClaimed?'none':'flex';}
+  dailyClaimed=true;
+  document.getElementById('daily-dot').style.display='none';
+  alert("🪙 100 Daily Bonus Claimed!");
+}
 </script>
 </body>
-</html>
+  </html>
