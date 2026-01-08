@@ -3,17 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TIKI BOOST</title>
+<title>TIKI BOOST - Home</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
-body{background:#0f0f0f;color:white;overflow-x:hidden;}
-.hidden{display:none;}
-/* LOGIN PAGE */
-#login-page{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;}
-#login-page input{padding:10px 15px;border-radius:10px;border:none;width:250px;}
-#login-page button{padding:10px 20px;border:none;border-radius:10px;background:#ff0050;color:white;cursor:pointer;}
-/* HEADER */
-nav{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#111;position:sticky;top:0;z-index:10;}
+body{background:#0f0f0f;color:white;}
+nav{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#111;position:sticky;top:0;z-index:10;}
 .nav-left{display:flex;align-items:center;gap:10px;}
 .nav-left img{width:50px;height:50px;border-radius:10px;}
 .nav-center{flex:1;display:flex;justify-content:center;}
@@ -21,8 +15,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:10px 2
 .nav-right{display:flex;align-items:center;gap:15px;position:relative;}
 .coins-card{background:rgba(255,255,255,0.1);padding:5px 15px;border-radius:20px;display:flex;align-items:center;gap:5px;position:relative;cursor:pointer;}
 .daily-dot{width:12px;height:12px;background:red;border-radius:50%;position:absolute;top:0;right:0;display:flex;}
-/* HOME PAGE */
-#home-page{padding:20px;}
+#home-content{padding:20px;}
 .task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px;}
 .task-card{background:#161616;border-radius:15px;overflow:hidden;cursor:pointer;transition:0.3s;box-shadow:0 2px 8px rgba(0,0,0,0.5);display:flex;flex-direction:column;}
 .task-card:hover{transform:scale(1.02);box-shadow:0 0 15px #ff0050;}
@@ -32,7 +25,6 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:10px 2
 .task-info h4{font-size:16px;}
 .task-info p{font-size:14px;color:#ccc;}
 .username{font-size:12px;color:#aaa;}
-/* POST MODAL */
 #post-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:20;opacity:0;pointer-events:none;transition:0.3s;}
 #post-modal.show{opacity:1;pointer-events:auto;}
 #post-content{background:#222;padding:20px;border-radius:15px;width:90%;max-width:400px;transform:translateY(-50px);transition:0.3s;}
@@ -44,39 +36,30 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:10px 2
 #history-list .history-item{background:#161616;margin:5px 0;padding:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;transition:0.3s;}
 .history-item.active{border-left:5px solid green;}
 .history-item.inactive{border-left:5px solid red;}
-/* COIN SPLASH */
 .coin-splash{position:absolute;font-size:20px;font-weight:bold;color:#f4b400;animation:flyCoin 1s forwards;pointer-events:none;}
 @keyframes flyCoin{0%{opacity:1;transform:translateY(0) scale(1);}50%{transform:translateY(-50px) scale(1.5);}100%{opacity:0;transform:translateY(-100px) scale(0.5);}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN PAGE -->
-<div id="login-page">
-  <h1>TIKI BOOST</h1>
-  <input type="email" id="email-login" placeholder="Enter your email">
-  <button onclick="login()">Continue</button>
-</div>
+<nav>
+  <div class="nav-left">
+    <img src="https://i.ibb.co/HLHvwk7d/large-1.png" alt="TIKI BOOST">
+    <h2>TIKI BOOST</h2>
+  </div>
+  <div class="nav-center">
+    <input id="search-bar" placeholder="Search" oninput="filterTasks()">
+  </div>
+  <div class="nav-right">
+    <div class="coins-card" onclick="claimDailyBonus()">
+      🪙 <span id="coins">0</span>
+      <div class="daily-dot" id="daily-dot"></div>
+    </div>
+    <button onclick="openPostModal()">+</button>
+  </div>
+</nav>
 
-<!-- HOME PAGE -->
-<div id="home-page" class="hidden">
-  <nav>
-    <div class="nav-left">
-      <img src="https://i.ibb.co/HLHvwk7d/large-1.png" alt="TIKI BOOST">
-      <h2>TIKI BOOST</h2>
-    </div>
-    <div class="nav-center">
-      <input id="search-bar" placeholder="Search" oninput="filterTasks()">
-    </div>
-    <div class="nav-right">
-      <div class="coins-card" onclick="claimDailyBonus()">
-        🪙 <span id="coins">0</span>
-        <div class="daily-dot" id="daily-dot"></div>
-      </div>
-      <button style="margin-left:10px;" onclick="openPostModal()">+</button>
-    </div>
-  </nav>
-
+<div id="home-content">
   <div class="task-grid" id="tasks-container"></div>
 </div>
 
@@ -123,19 +106,10 @@ const db=firebase.firestore();
 
 let userId=null,dailyClaimed=false,coinsCounter=0,tasksCache=[];
 
-// LOGIN
-function login(){
-  const email=document.getElementById('email-login').value;
-  if(!email)return alert("Enter email");
-  auth.signInWithEmailAndPassword(email,"123456").catch(()=>auth.createUserWithEmailAndPassword(email,"123456"));
-}
-
 // AUTH STATE
 auth.onAuthStateChanged(async user=>{
-  if(!user) return;
+  if(!user) return window.location.href="login.html";
   userId=user.uid;
-  document.getElementById('login-page').classList.add('hidden');
-  document.getElementById('home-page').classList.remove('hidden');
   const userRef=db.collection('users').doc(userId);
   if(!(await userRef.get()).exists()) await userRef.set({coins:0,history:[],lastDaily:null,username:user.email.split("@")[0]});
   userRef.onSnapshot(snap=>{
@@ -269,4 +243,4 @@ async function claimDailyBonus(){
 }
 </script>
 </body>
-  </html>
+</html>
