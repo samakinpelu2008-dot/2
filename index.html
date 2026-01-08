@@ -2,181 +2,180 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>TIKI BOOST</title>
+<title>TikiBoost</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="module">
+
+/* 🔥 FIREBASE SETUP */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc,
+  updateDoc, collection, addDoc,
+  onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDeFlOeRoiNjqH9LAclnqnehXNY6scPqzE",
+  authDomain: "businessio-37c69.firebaseapp.com",
+  projectId: "businessio-37c69",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* 🔐 AUTH */
+window.login = async () => {
+  const e = email.value, p = pass.value;
+  try {
+    const u = await signInWithEmailAndPassword(auth, e, p);
+  } catch {
+    const u = await createUserWithEmailAndPassword(auth, e, p);
+    await setDoc(doc(db, "users", u.user.uid), {
+      coins: 0,
+      lastDaily: "",
+      created: serverTimestamp()
+    });
+  }
+};
+
+/* 👤 SESSION */
+onAuthStateChanged(auth, async user => {
+  if (!user) return;
+  loginPage.style.display = "none";
+  appPage.style.display = "block";
+
+  window.uid = user.uid;
+  const snap = await getDoc(doc(db,"users",uid));
+  window.coins = snap.data().coins;
+  coinText.innerText = coins;
+
+  listenTasks();
+});
+
+/* 🪙 DAILY */
+window.daily = async () => {
+  const ref = doc(db,"users",uid);
+  const snap = await getDoc(ref);
+  if (snap.data().lastDaily === new Date().toDateString()) return;
+
+  window.open("https://www.effectivegatecpm.com/prwmz1t9?key=17b80b2cde4a338414105a2c5427f8ce","_blank");
+  setTimeout(async ()=>{
+    const reward=[5,10,15,20,30,50][Math.floor(Math.random()*6)];
+    coins += reward;
+    await updateDoc(ref,{
+      coins,
+      lastDaily:new Date().toDateString()
+    });
+    coinText.innerText = coins;
+    alert("+"+reward+" coins");
+  },3000);
+};
+
+/* ➕ POST */
+window.postTask = async () => {
+  const l = link.value;
+  if (!l) return;
+
+  if (promo.value === "Akinpepe100") {
+    coins += 500;
+    await updateDoc(doc(db,"users",uid),{coins});
+    coinText.innerText = coins;
+  }
+
+  const type = l.includes("/video/") ? "LIKE" : "FOLLOW";
+
+  await addDoc(collection(db,"tasks"),{
+    link:l,
+    type,
+    qty:+qty.value,
+    created:serverTimestamp()
+  });
+
+  modal.style.display="none";
+};
+
+/* 📡 TASKS */
+function listenTasks(){
+  onSnapshot(collection(db,"tasks"), snap=>{
+    feed.innerHTML="";
+    snap.forEach(d=>{
+      const t=d.data();
+      const c=document.createElement("div");
+      c.className="card";
+      c.innerHTML=`<div class="thumb"></div>
+      <div><b>${t.type}</b> ${t.qty}</div>`;
+      c.onclick=()=>{
+        window.open(t.link,"_blank");
+        setTimeout(async ()=>{
+          coins+= t.type=="LIKE"?2:4;
+          coinText.innerText=coins;
+          await updateDoc(doc(db,"users",uid),{coins});
+        },3000);
+      };
+      feed.appendChild(c);
+    });
+  });
+}
+
+</script>
 
 <style>
 body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff}
-header{
-  display:flex;align-items:center;
-  padding:10px;background:#000;
-  position:sticky;top:0;z-index:10
-}
-header img{width:32px}
-.search{flex:1;margin:0 10px}
-.search input{
-  width:100%;padding:8px;border:none;
-  border-radius:8px;background:#222;color:#fff
-}
-.coins{padding:6px 12px;background:#222;border-radius:8px;position:relative;cursor:pointer}
-.dot{width:10px;height:10px;background:red;border-radius:50%;position:absolute;top:-4px;right:-4px}
-
-.tabs{
-  display:flex;justify-content:space-around;
-  background:#000;padding:6px 0
-}
-.tabs div{cursor:pointer;opacity:.6}
-.tabs .active{opacity:1}
-
-.feed{padding:10px}
-.card{
-  display:flex;align-items:center;
-  background:#1b1b1b;
-  padding:10px;border-radius:12px;
-  margin-bottom:10px;
-  transition:.2s
-}
-.card:hover{transform:scale(1.02)}
-.thumb{
-  width:50px;height:50px;border-radius:50%;
-  background:#333;margin-right:10px
-}
-.info b{display:block}
-.plus{
-  position:fixed;bottom:20px;left:50%;
-  transform:translateX(-50%);
-  width:60px;height:60px;border-radius:50%;
-  background:#ff0050;
-  display:flex;align-items:center;justify-content:center;
-  font-size:36px;cursor:pointer
-}
-
-.modal{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.8);
-  display:none;align-items:center;justify-content:center
-}
-.box{
-  width:90%;max-width:400px;
-  background:#222;padding:20px;
-  border-radius:12px
-}
-.box input,.box select{
-  width:100%;padding:10px;margin-bottom:10px;
-  background:#111;color:#fff;border:none;border-radius:6px
-}
-.box button{
-  width:100%;padding:10px;
-  background:#ff0050;border:none;
-  color:#fff;border-radius:6px
-}
+#loginPage,#appPage{display:none;padding:20px}
+input,select,button{width:100%;padding:12px;margin:6px 0;border:none;border-radius:6px}
+button{background:#ff0050;color:#fff}
+header{display:flex;align-items:center;background:#000;padding:10px}
+header img{width:28px}
+.coins{margin-left:auto;background:#222;padding:6px 10px;border-radius:6px}
+.card{background:#1c1c1c;padding:10px;border-radius:10px;margin:10px 0;display:flex}
+.thumb{width:50px;height:50px;background:#333;border-radius:50%;margin-right:10px}
+.plus{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+width:60px;height:60px;border-radius:50%;background:#ff0050;
+display:flex;align-items:center;justify-content:center;font-size:36px}
+.modal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center}
+.box{background:#222;padding:20px;border-radius:10px;width:90%}
 </style>
-</head>
 
 <body>
 
-<header>
-  <img src="https://i.ibb.co/HLHvwk7d/large-1.png">
-  <div class="search"><input placeholder="Search"></div>
-  <div class="coins" onclick="daily()">
-    🪙 <span id="coins">0</span>
-    <div id="dot" class="dot"></div>
-  </div>
-</header>
-
-<div class="tabs">
-  <div class="active" onclick="tab('home')">Home</div>
-  <div onclick="tab('history')">History</div>
-  <div onclick="tab('profile')">Profile</div>
+<!-- 🔐 LOGIN -->
+<div id="loginPage">
+  <h2>Login</h2>
+  <input id="email" placeholder="Email">
+  <input id="pass" type="password" placeholder="Password">
+  <button onclick="login()">Continue</button>
 </div>
 
-<div id="home" class="feed"></div>
-<div id="history" class="feed" style="display:none"></div>
-<div id="profile" class="feed" style="display:none"></div>
+<!-- 🚀 APP -->
+<div id="appPage">
+  <header>
+    <img src="https://i.ibb.co/HLHvwk7d/large-1.png">
+    <div class="coins" onclick="daily()">🪙 <span id="coinText">0</span></div>
+  </header>
 
-<div class="plus" onclick="openPost()">+</div>
+  <div id="feed"></div>
+  <div class="plus" onclick="modal.style.display='flex'">+</div>
+</div>
 
+<!-- ➕ MODAL -->
 <div class="modal" id="modal">
   <div class="box">
-    <input id="link" placeholder="Paste TikTok link">
-    <input placeholder="Promo code (optional)">
+    <input id="link" placeholder="TikTok link">
+    <input id="promo" placeholder="Promo code">
     <select id="qty">
       <option>10</option><option>20</option><option>50</option>
       <option>100</option><option>200</option><option>500</option><option>1000</option>
     </select>
-    <button onclick="post()">Next</button>
+    <button onclick="postTask()">Post</button>
   </div>
 </div>
-
-<script>
-let coins=+localStorage.coins||0;
-let tasks=JSON.parse(localStorage.tasks||"[]");
-let done=JSON.parse(localStorage.done||"[]");
-document.getElementById("coins").innerText=coins;
-
-function save(){
-  localStorage.coins=coins;
-  localStorage.tasks=JSON.stringify(tasks);
-  localStorage.done=JSON.stringify(done);
-  document.getElementById("coins").innerText=coins;
-}
-
-function daily(){
-  if(localStorage.daily==new Date().toDateString())return;
-  window.open("https://www.effectivegatecpm.com/prwmz1t9?key=17b80b2cde4a338414105a2c5427f8ce","_blank");
-  setTimeout(()=>{
-    let r=[5,10,20,30,50][Math.floor(Math.random()*5)];
-    coins+=r;save();
-    localStorage.daily=new Date().toDateString();
-    document.getElementById("dot").style.display="none";
-    alert("+"+r+" coins");
-  },3000);
-}
-if(localStorage.daily!==new Date().toDateString())
-  document.getElementById("dot").style.display="block";
-
-function openPost(){modal.style.display="flex"}
-function post(){
-  let l=link.value;if(!l)return;
-  let type=l.includes("/video/")?"LIKE":"FOLLOW";
-  tasks.unshift({l,type,q:+qty.value});
-  save();modal.style.display="none";render();
-}
-
-function render(){
-  home.innerHTML="";
-  history.innerHTML="";
-  profile.innerHTML=`<h2>Coins: ${coins}</h2><p>Completed: ${done.length}</p>`;
-  tasks.forEach(t=>{
-    if(done.includes(t.l))return;
-    let c=document.createElement("div");
-    c.className="card";
-    c.innerHTML=`<div class="thumb"></div>
-    <div class="info"><b>${t.type}</b>${t.q} required</div>`;
-    c.onclick=()=>{
-      window.open(t.l,"_blank");
-      setTimeout(()=>{
-        coins+=t.type=="LIKE"?2:4;
-        done.push(t.l);save();render();
-      },3000);
-    };
-    home.appendChild(c);
-  });
-  done.forEach(l=>{
-    let c=document.createElement("div");
-    c.className="card";
-    c.innerHTML=`<div class="thumb"></div><div>Completed</div>`;
-    history.appendChild(c);
-  });
-}
-function tab(t){
-  home.style.display=history.style.display=profile.style.display="none";
-  document.getElementById(t).style.display="block";
-  document.querySelectorAll(".tabs div").forEach(x=>x.classList.remove("active"));
-  event.target.classList.add("active");
-}
-render();
-</script>
 
 </body>
 </html>
