@@ -1,273 +1,156 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <title>Football Match Simulator</title>
-
 <style>
-body{
-background:#111;
-color:white;
-font-family:Arial;
-text-align:center;
-}
-
-button{
-padding:10px 20px;
-margin:10px;
-font-size:16px;
-}
-
-#teams button{
-display:block;
-margin:10px auto;
-width:200px;
-}
-
-#scoreboard{
-font-size:40px;
-margin-top:20px;
-}
-
-#events{
-border:1px solid white;
-height:200px;
-overflow:auto;
-margin-top:20px;
-padding:10px;
-}
+body { background:#111; color:white; font-family:Arial; text-align:center; }
+button { padding:10px 20px; margin:5px; font-size:16px; cursor:pointer; }
+#teams button { display:block; margin:10px auto; width:200px; }
+#scoreboard { font-size:40px; margin-top:20px; }
+#events { border:1px solid white; height:200px; overflow:auto; margin-top:20px; padding:10px; text-align:left; }
+#timer { font-size:30px; margin-top:10px; }
 </style>
 </head>
-
 <body>
 
 <h1>Football Match Simulator</h1>
 
 <div id="home">
-
-<input id="roomInput" placeholder="Type Room Name (example Samuel1)">
-<br><br>
-
+<input id="roomInput" placeholder="Type Room Name (e.g., Samuel1)">
+<br>
 <button onclick="joinRoom()">Join Room</button>
-
 </div>
 
 <div id="lobby" style="display:none">
-
 <h2>Room: <span id="roomName"></span></h2>
-
 <h3>Select Your Club</h3>
-
 <div id="teams">
-
 <button onclick="selectTeam('Man U',90)">Man U (90)</button>
 <button onclick="selectTeam('Man C',80)">Man C (80)</button>
 <button onclick="selectTeam('Arsenal',75)">Arsenal (75)</button>
 <button onclick="selectTeam('Liverpool',60)">Liverpool (60)</button>
-
 </div>
-
 <button onclick="ready()">READY</button>
-
-<p>Waiting for other player...</p>
-
+<p id="waitingText">Waiting for other player...</p>
 </div>
 
 <div id="match" style="display:none">
-
 <div id="scoreboard">
-
-<span id="team1">Team1</span>
-<span id="score1">0</span>
-
--
-
-<span id="score2">0</span>
-<span id="team2">Team2</span>
-
+<span id="team1">Team1</span> <span id="score1">0</span> - <span id="score2">0</span> <span id="team2">Team2</span>
 </div>
-
-<h2 id="time">0</h2>
-
+<div id="timer">0</div>
 <div id="events"></div>
-
 </div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+// 🔑 Your Firebase config
 const firebaseConfig = {
-apiKey: "AIzaSyDRna9X7GVgBwj5xjECu-bJYos_1UMCLh4",
-authDomain: "chess-a4f8a.firebaseapp.com",
-databaseURL: "https://chess-a4f8a-default-rtdb.firebaseio.com",
-projectId: "chess-a4f8a",
-storageBucket: "chess-a4f8a.firebasestorage.app",
-messagingSenderId: "631062330530",
-appId: "1:631062330530:web:f003eabd02559c9b4dabfb"
+  apiKey: "AIzaSyDRna9X7GVgBwj5xjECu-bJYos_1UMCLh4",
+  authDomain: "chess-a4f8a.firebaseapp.com",
+  databaseURL: "https://chess-a4f8a-default-rtdb.firebaseio.com",
+  projectId: "chess-a4f8a",
+  storageBucket: "chess-a4f8a.firebasestorage.app",
+  messagingSenderId: "631062330530",
+  appId: "1:631062330530:web:f003eabd02559c9b4dabfb"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let room="";
-let player="";
-let team="";
-let rating=0;
-
+let room = "";
+let player = "";
+let team = "";
+let rating = 0;
+let engine = false;
 let score1=0;
 let score2=0;
 
-window.joinRoom=function(){
-
-room=document.getElementById("roomInput").value;
-
-if(room=="") return;
-
-player="player"+Math.floor(Math.random()*10000);
-
-set(ref(db,"rooms/"+room+"/players/"+player),{
-team:null,
-ready:false
-});
-
-document.getElementById("home").style.display="none";
-document.getElementById("lobby").style.display="block";
-document.getElementById("roomName").innerText=room;
-
-listenRoom();
-
+// 🔹 Join Room
+window.joinRoom = function() {
+  room = document.getElementById("roomInput").value.trim();
+  if(room==="") return;
+  player = "player"+Math.floor(Math.random()*100000);
+  set(ref(db,"rooms/"+room+"/players/"+player),{team:null, ready:false});
+  document.getElementById("home").style.display="none";
+  document.getElementById("lobby").style.display="block";
+  document.getElementById("roomName").innerText = room;
+  listenRoom();
 }
 
-window.selectTeam=function(t,r){
-
-team=t;
-rating=r;
-
-update(ref(db,"rooms/"+room+"/players/"+player),{
-team:t
-});
-
+// 🔹 Select Team
+window.selectTeam = function(t,r) {
+  team=t; rating=r;
+  update(ref(db,"rooms/"+room+"/players/"+player),{team:t});
 }
 
-window.ready=function(){
-
-update(ref(db,"rooms/"+room+"/players/"+player),{
-ready:true
-});
-
+// 🔹 Press READY
+window.ready = function() {
+  update(ref(db,"rooms/"+room+"/players/"+player),{ready:true});
+  document.getElementById("waitingText").innerText="Waiting for other player...";
 }
 
-function listenRoom(){
-
-onValue(ref(db,"rooms/"+room+"/players"),(snapshot)=>{
-
-let players=snapshot.val();
-
-if(!players) return;
-
-let list=Object.values(players);
-
-if(list.length==2){
-
-let ready=list.every(p=>p.ready);
-
-if(ready){
-
-startMatch(list);
-
+// 🔹 Listen for players and start match when ready
+function listenRoom() {
+  onValue(ref(db,"rooms/"+room+"/players"),(snap)=>{
+    const players = snap.val();
+    if(!players) return;
+    const list = Object.values(players);
+    // Assign engine to first player who joined
+    if(!engine && Object.keys(players)[0]===player) engine = true;
+    const readyAll = list.length===2 && list.every(p=>p.ready);
+    if(readyAll) startMatch(list);
+  });
 }
 
+// 🔹 Start Match
+function startMatch(players) {
+  document.getElementById("lobby").style.display="none";
+  document.getElementById("match").style.display="block";
+  document.getElementById("team1").innerText=players[0].team;
+  document.getElementById("team2").innerText=players[1].team;
+
+  if(engine) runEngine(players);
+  syncMatch();
 }
 
-});
-
+// 🔹 Match Engine (only engine device updates Firebase)
+function runEngine(players){
+  let minute=0; let s1=0; let s2=0;
+  const interval=setInterval(()=>{
+    minute++;
+    let chance=Math.random();
+    let lastEvent="";
+    if(chance<0.08){ // Goal
+      if(Math.random()>0.5){ s1++; lastEvent=minute+" ⚽ GOAL "+players[0].team;}
+      else{ s2++; lastEvent=minute+" ⚽ GOAL "+players[1].team;}
+    } else if(chance<0.13){ lastEvent=minute+" 🟨 Yellow Card"; }
+    else if(chance<0.16){ lastEvent=minute+" 🟥 Red Card"; }
+    else if(chance<0.20){ lastEvent=minute+" 🚩 Corner"; }
+    update(ref(db,"rooms/"+room+"/match"),{
+      minute:minute,
+      score1:s1,
+      score2:s2,
+      lastEvent:lastEvent
+    });
+    if(minute>=90) clearInterval(interval);
+  },1000);
 }
 
-function startMatch(players){
-
-document.getElementById("lobby").style.display="none";
-document.getElementById("match").style.display="block";
-
-document.getElementById("team1").innerText=players[0].team;
-document.getElementById("team2").innerText=players[1].team;
-
-simulate();
-
-}
-
-function simulate(){
-
-let minute=0;
-
-let timer=setInterval(()=>{
-
-minute++;
-
-document.getElementById("time").innerText=minute;
-
-event(minute);
-
-if(minute>=90) clearInterval(timer);
-
-},1000);
-
-}
-
-function event(minute){
-
-let chance=Math.random();
-
-if(chance<0.08){
-
-goal(minute);
-
-}
-else if(chance<0.13){
-
-add(minute+" 🟨 Yellow Card");
-
-}
-else if(chance<0.16){
-
-add(minute+" 🟥 Red Card");
-
-}
-else if(chance<0.20){
-
-add(minute+" 🚩 Corner");
-
-}
-
-}
-
-function goal(minute){
-
-if(Math.random()>0.5){
-
-score1++;
-document.getElementById("score1").innerText=score1;
-add(minute+" ⚽ GOAL");
-
-}else{
-
-score2++;
-document.getElementById("score2").innerText=score2;
-add(minute+" ⚽ GOAL");
-
-}
-
-}
-
-function add(text){
-
-let box=document.getElementById("events");
-
-box.innerHTML=text+"<br>"+box.innerHTML;
-
+// 🔹 Sync match to all devices
+function syncMatch(){
+  onValue(ref(db,"rooms/"+room+"/match"),(snap)=>{
+    const data=snap.val(); if(!data) return;
+    document.getElementById("timer").innerText=data.minute;
+    document.getElementById("score1").innerText=data.score1||0;
+    document.getElementById("score2").innerText=data.score2||0;
+    if(data.lastEvent) document.getElementById("events").innerHTML=data.lastEvent+"<br>"+document.getElementById("events").innerHTML;
+  });
 }
 
 </script>
-
 </body>
 </html>
