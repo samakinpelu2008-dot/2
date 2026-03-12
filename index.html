@@ -28,8 +28,8 @@ button { padding:10px 20px; margin:5px; font-size:16px; cursor:pointer; }
 <div id="teams">
 <button onclick="selectTeam('Man U',90)">Man U (90)</button>
 <button onclick="selectTeam('Man C',80)">Man C (80)</button>
-<button onclick="selectTeam('Arsenal',75)">Arsenal (75)</button>
-<button onclick="selectTeam('Liverpool',60)">Liverpool (60)</button>
+<button onclick="selectTeam('Arsenal',75)">Arsenal</button>
+<button onclick="selectTeam('Liverpool',60)">Liverpool</button>
 </div>
 <button onclick="ready()">READY</button>
 <p id="waitingText">Waiting for other player...</p>
@@ -43,114 +43,95 @@ button { padding:10px 20px; margin:5px; font-size:16px; cursor:pointer; }
 <div id="events"></div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+<!-- Firebase Classic Scripts -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
 
-// 🔑 Your Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyDRna9X7GVgBwj5xjECu-bJYos_1UMCLh4",
-  authDomain: "chess-a4f8a.firebaseapp.com",
-  databaseURL: "https://chess-a4f8a-default-rtdb.firebaseio.com",
-  projectId: "chess-a4f8a",
-  storageBucket: "chess-a4f8a.firebasestorage.app",
-  messagingSenderId: "631062330530",
-  appId: "1:631062330530:web:f003eabd02559c9b4dabfb"
-};
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDRna9X7GVgBwj5xjECu-bJYos_1UMCLh4",
+    authDomain: "chess-a4f8a.firebaseapp.com",
+    databaseURL: "https://chess-a4f8a-default-rtdb.firebaseio.com",
+    projectId: "chess-a4f8a",
+    storageBucket: "chess-a4f8a.firebasestorage.app",
+    messagingSenderId: "631062330530",
+    appId: "1:631062330530:web:f003eabd02559c9b4dabfb"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+  let room="", player="", team="", rating=0, engine=false;
+  let score1=0, score2=0;
 
-let room = "";
-let player = "";
-let team = "";
-let rating = 0;
-let engine = false;
-let score1=0;
-let score2=0;
+  function joinRoom() {
+    room = document.getElementById("roomInput").value.trim();
+    if(room==="") return;
+    player = "player"+Math.floor(Math.random()*100000);
+    firebase.database().ref("rooms/"+room+"/players/"+player).set({team:null, ready:false});
+    document.getElementById("home").style.display="none";
+    document.getElementById("lobby").style.display="block";
+    document.getElementById("roomName").innerText = room;
+    listenRoom();
+  }
 
-// 🔹 Join Room
-window.joinRoom = function() {
-  room = document.getElementById("roomInput").value.trim();
-  if(room==="") return;
-  player = "player"+Math.floor(Math.random()*100000);
-  set(ref(db,"rooms/"+room+"/players/"+player),{team:null, ready:false});
-  document.getElementById("home").style.display="none";
-  document.getElementById("lobby").style.display="block";
-  document.getElementById("roomName").innerText = room;
-  listenRoom();
-}
+  function selectTeam(t,r) { team=t; rating=r;
+    firebase.database().ref("rooms/"+room+"/players/"+player).update({team:t});
+  }
 
-// 🔹 Select Team
-window.selectTeam = function(t,r) {
-  team=t; rating=r;
-  update(ref(db,"rooms/"+room+"/players/"+player),{team:t});
-}
+  function ready() {
+    firebase.database().ref("rooms/"+room+"/players/"+player).update({ready:true});
+    document.getElementById("waitingText").innerText="Waiting for other player...";
+  }
 
-// 🔹 Press READY
-window.ready = function() {
-  update(ref(db,"rooms/"+room+"/players/"+player),{ready:true});
-  document.getElementById("waitingText").innerText="Waiting for other player...";
-}
-
-// 🔹 Listen for players and start match when ready
-function listenRoom() {
-  onValue(ref(db,"rooms/"+room+"/players"),(snap)=>{
-    const players = snap.val();
-    if(!players) return;
-    const list = Object.values(players);
-    // Assign engine to first player who joined
-    if(!engine && Object.keys(players)[0]===player) engine = true;
-    const readyAll = list.length===2 && list.every(p=>p.ready);
-    if(readyAll) startMatch(list);
-  });
-}
-
-// 🔹 Start Match
-function startMatch(players) {
-  document.getElementById("lobby").style.display="none";
-  document.getElementById("match").style.display="block";
-  document.getElementById("team1").innerText=players[0].team;
-  document.getElementById("team2").innerText=players[1].team;
-
-  if(engine) runEngine(players);
-  syncMatch();
-}
-
-// 🔹 Match Engine (only engine device updates Firebase)
-function runEngine(players){
-  let minute=0; let s1=0; let s2=0;
-  const interval=setInterval(()=>{
-    minute++;
-    let chance=Math.random();
-    let lastEvent="";
-    if(chance<0.08){ // Goal
-      if(Math.random()>0.5){ s1++; lastEvent=minute+" ⚽ GOAL "+players[0].team;}
-      else{ s2++; lastEvent=minute+" ⚽ GOAL "+players[1].team;}
-    } else if(chance<0.13){ lastEvent=minute+" 🟨 Yellow Card"; }
-    else if(chance<0.16){ lastEvent=minute+" 🟥 Red Card"; }
-    else if(chance<0.20){ lastEvent=minute+" 🚩 Corner"; }
-    update(ref(db,"rooms/"+room+"/match"),{
-      minute:minute,
-      score1:s1,
-      score2:s2,
-      lastEvent:lastEvent
+  function listenRoom() {
+    firebase.database().ref("rooms/"+room+"/players").on("value",(snap)=>{
+      const players = snap.val(); if(!players) return;
+      const list = Object.values(players);
+      if(!engine && Object.keys(players)[0]===player) engine = true; // engine = first player
+      if(list.length===2 && list.every(p=>p.ready)) startMatch(list);
     });
-    if(minute>=90) clearInterval(interval);
-  },1000);
-}
+  }
 
-// 🔹 Sync match to all devices
-function syncMatch(){
-  onValue(ref(db,"rooms/"+room+"/match"),(snap)=>{
-    const data=snap.val(); if(!data) return;
-    document.getElementById("timer").innerText=data.minute;
-    document.getElementById("score1").innerText=data.score1||0;
-    document.getElementById("score2").innerText=data.score2||0;
-    if(data.lastEvent) document.getElementById("events").innerHTML=data.lastEvent+"<br>"+document.getElementById("events").innerHTML;
-  });
-}
+  function startMatch(players) {
+    document.getElementById("lobby").style.display="none";
+    document.getElementById("match").style.display="block";
+    document.getElementById("team1").innerText = players[0].team;
+    document.getElementById("team2").innerText = players[1].team;
+    if(engine) runEngine(players);
+    syncMatch();
+  }
 
+  function runEngine(players) {
+    let minute=0, s1=0, s2=0;
+    const interval = setInterval(()=>{
+      minute++;
+      let chance=Math.random(), lastEvent="";
+      if(chance<0.08){
+        if(Math.random()>0.5){ s1++; lastEvent=minute+" ⚽ GOAL "+players[0].team;}
+        else{ s2++; lastEvent=minute+" ⚽ GOAL "+players[1].team;}
+      } else if(chance<0.13){ lastEvent=minute+" 🟨 Yellow Card"; }
+      else if(chance<0.16){ lastEvent=minute+" 🟥 Red Card"; }
+      else if(chance<0.20){ lastEvent=minute+" 🚩 Corner"; }
+      firebase.database().ref("rooms/"+room+"/match").set({
+        minute:minute,
+        score1:s1,
+        score2:s2,
+        lastEvent:lastEvent
+      });
+      if(minute>=90) clearInterval(interval);
+    },1000);
+  }
+
+  function syncMatch() {
+    firebase.database().ref("rooms/"+room+"/match").on("value",(snap)=>{
+      const data=snap.val(); if(!data) return;
+      document.getElementById("timer").innerText = data.minute;
+      document.getElementById("score1").innerText = data.score1||0;
+      document.getElementById("score2").innerText = data.score2||0;
+      if(data.lastEvent) document.getElementById("events").innerHTML = data.lastEvent+"<br>"+document.getElementById("events").innerHTML;
+    });
+  }
 </script>
 </body>
 </html>
