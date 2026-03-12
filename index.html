@@ -1,237 +1,273 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>TIKI BOOST</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script type="module">
-
-// 🔹 FIREBASE
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, onSnapshot, serverTimestamp, query } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDeFlOeRoiNjqH9LAclnqnehXNY6scPqzE",
-  authDomain: "businessio-37c69.firebaseapp.com",
-  projectId: "businessio-37c69"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// 🔹 GLOBAL VARIABLES
-let uid, coins=0;
-
-// 🔹 LOGIN
-window.login = async () => {
-  const e = email.value, p = pass.value;
-  try {
-    const u = await signInWithEmailAndPassword(auth, e, p);
-  } catch {
-    const u = await createUserWithEmailAndPassword(auth, e, p);
-    await setDoc(doc(db,"users",u.user.uid),{
-      coins: 0,
-      lastDaily:"",
-      created:serverTimestamp()
-    });
-  }
-};
-
-// 🔹 AUTH STATE
-onAuthStateChanged(auth, async user => {
-  if(!user) return;
-  uid = user.uid;
-  loginPage.style.display="none";
-  appPage.style.display="block";
-  const snap = await getDoc(doc(db,"users",uid));
-  coins = snap.data().coins || 0;
-  coinText.innerText = coins;
-  listenTasks();
-  checkDailyDot();
-});
-
-// 🔹 DAILY REWARD
-window.daily = async () => {
-  const ref = doc(db,"users",uid);
-  const snap = await getDoc(ref);
-  if(snap.data().lastDaily === new Date().toDateString()) return;
-  window.open("https://www.effectivegatecpm.com/prwmz1t9?key=17b80b2cde4a338414105a2c5427f8ce","_blank");
-  setTimeout(async ()=>{
-    const r=[5,10,15,20,30,50][Math.floor(Math.random()*6)];
-    coins += r;
-    await updateDoc(ref,{coins,lastDaily:new Date().toDateString()});
-    coinText.innerText = coins;
-    dot.style.display="none";
-    alert("+"+r+" coins");
-  },3000);
-};
-
-function checkDailyDot(){
-  getDoc(doc(db,"users",uid)).then(snap=>{
-    if(snap.data().lastDaily !== new Date().toDateString()){
-      dot.style.display="block";
-    } else dot.style.display="none";
-  });
-}
-
-// 🔹 DETECT TASK TYPE
-function detectTaskType(link){
-  link = link.toLowerCase();
-  if(link.includes("vt.tiktok.com") || link.includes("/video/")) return "LIKE";
-  if(link.includes("tiktok.com/@")) return "FOLLOW";
-  return "INVALID";
-}
-
-// 🔹 POST TASK
-window.postTask = async () => {
-  const l = link.value.trim();
-  const p = promo.value.trim();
-  const q = +qty.value;
-  if(!l) return alert("Enter a link");
-  const type = detectTaskType(l);
-  if(type==="INVALID") return alert("Invalid TikTok link");
-
-  if(coins < 1) return alert("Not enough coins");
-  coins -= 1;
-  await updateDoc(doc(db,"users",uid),{coins});
-
-  if(p === "Akinpepe100") {
-    coins += 500;
-    await updateDoc(doc(db,"users",uid),{coins});
-    coinText.innerText = coins;
-  }
-
-  await addDoc(collection(db,"tasks"),{
-    link:l,
-    type,
-    qty:q,
-    promo:p,
-    created:serverTimestamp(),
-    uid:uid
-  });
-
-  modal.style.display="none";
-  coinText.innerText = coins;
-};
-
-// 🔹 LISTEN TASKS WITH THUMBNAILS
-function listenTasks(){
-  const q = query(collection(db,"tasks"));
-  onSnapshot(q,snap=>{
-    feed.innerHTML="";
-    snap.forEach(async d=>{
-      const t = d.data();
-      if(t.completed && t.completed.includes(uid)) return;
-
-      let thumbnail = "";
-      try {
-        const res = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(t.link)}`);
-        const data = await res.json();
-        if(t.type==="LIKE") thumbnail = data.thumbnail_url;
-        else if(t.type==="FOLLOW") thumbnail = data.author_avatar || data.thumbnail_url;
-      } catch(e){ thumbnail = ""; }
-
-      const card = document.createElement("div");
-      card.className="card";
-      card.innerHTML = `<img src="${thumbnail}" class="thumb"><div><b>${t.type}</b> ${t.qty} ${t.promo?`<br>Promo: ${t.promo}`:""}</div>`;
-
-      card.onclick = async () => {
-        window.open(t.link,"_blank");
-        setTimeout(async ()=>{
-          const reward = t.type==="LIKE"?2:4;
-          coins += reward;
-          coinText.innerText = coins;
-          const userRef = doc(db,"users",uid);
-          await updateDoc(userRef,{coins});
-          const taskRef = doc(db,"tasks",d.id);
-          const done = t.completed||[];
-          done.push(uid);
-          await updateDoc(taskRef,{completed:done});
-        },3000);
-      };
-
-      feed.appendChild(card);
-    });
-  });
-}
-
-// 🔹 SEARCH (filter by promo code)
-searchInput.oninput = async () => {
-  const s = searchInput.value.toLowerCase();
-  feed.innerHTML="";
-  const q = query(collection(db,"tasks"));
-  onSnapshot(q,snap=>{
-    snap.forEach(d=>{
-      const t = d.data();
-      if(t.completed && t.completed.includes(uid)) return;
-      if(!t.promo.toLowerCase().includes(s)) return;
-
-      const card = document.createElement("div");
-      card.className="card";
-      card.innerHTML = `<div><b>${t.type}</b> ${t.qty} <br>Promo: ${t.promo}</div>`;
-      card.onclick = () => window.open(t.link,"_blank");
-      feed.appendChild(card);
-    });
-  });
-};
-
-</script>
+<title>Football Match Simulator</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff}
-#loginPage,#appPage{display:none;padding:20px}
-input,select,button{width:100%;padding:12px;margin:6px 0;border:none;border-radius:6px}
-button{background:#ff0050;color:#fff}
-header{display:flex;align-items:center;background:#000;padding:10px}
-header img{width:28px}
-.coins{margin-left:auto;background:#222;padding:6px 10px;border-radius:6px;position:relative;cursor:pointer}
-.dot{width:10px;height:10px;background:red;border-radius:50%;position:absolute;top:-4px;right:-4px}
-.card{background:#1c1c1c;padding:10px;border-radius:10px;margin:10px 0;display:flex;align-items:center;cursor:pointer;transition:.2s}
-.card:hover{transform:scale(1.02)}
-.thumb{width:50px;height:50px;border-radius:10px;margin-right:10px;object-fit:cover}
-.plus{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-width:60px;height:60px;border-radius:50%;background:#ff0050;
-display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer}
-.modal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center}
-.box{background:#222;padding:20px;border-radius:10px;width:90%}
+body{
+background:#111;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+button{
+padding:10px 20px;
+margin:10px;
+font-size:16px;
+}
+
+#teams button{
+display:block;
+margin:10px auto;
+width:200px;
+}
+
+#scoreboard{
+font-size:40px;
+margin-top:20px;
+}
+
+#events{
+border:1px solid white;
+height:200px;
+overflow:auto;
+margin-top:20px;
+padding:10px;
+}
 </style>
+</head>
 
 <body>
 
-<!-- LOGIN PAGE -->
-<div id="loginPage">
-  <h2>Login</h2>
-  <input id="email" placeholder="Email">
-  <input id="pass" type="password" placeholder="Password">
-  <button onclick="login()">Continue</button>
+<h1>Football Match Simulator</h1>
+
+<div id="home">
+
+<input id="roomInput" placeholder="Type Room Name (example Samuel1)">
+<br><br>
+
+<button onclick="joinRoom()">Join Room</button>
+
 </div>
 
-<!-- APP PAGE -->
-<div id="appPage">
-  <header>
-    <img src="https://i.ibb.co/HLHvwk7d/large-1.png">
-    <input id="searchInput" placeholder="Search promo codes" style="flex:1;margin:0 10px;padding:6px;border-radius:6px;border:none;background:#222;color:#fff">
-    <div class="coins" onclick="daily()">🪙 <span id="coinText">0</span><div id="dot" class="dot"></div></div>
-  </header>
+<div id="lobby" style="display:none">
 
-  <div id="feed"></div>
-  <div class="plus" onclick="modal.style.display='flex'">+</div>
+<h2>Room: <span id="roomName"></span></h2>
+
+<h3>Select Your Club</h3>
+
+<div id="teams">
+
+<button onclick="selectTeam('Man U',90)">Man U (90)</button>
+<button onclick="selectTeam('Man C',80)">Man C (80)</button>
+<button onclick="selectTeam('Arsenal',75)">Arsenal (75)</button>
+<button onclick="selectTeam('Liverpool',60)">Liverpool (60)</button>
+
 </div>
 
-<!-- POST MODAL -->
-<div class="modal" id="modal">
-  <div class="box">
-    <input id="link" placeholder="TikTok link">
-    <input id="promo" placeholder="Promo code">
-    <select id="qty">
-      <option>10</option><option>20</option><option>50</option>
-      <option>100</option><option>200</option><option>500</option><option>1000</option>
-    </select>
-    <button onclick="postTask()">Post</button>
-  </div>
+<button onclick="ready()">READY</button>
+
+<p>Waiting for other player...</p>
+
 </div>
+
+<div id="match" style="display:none">
+
+<div id="scoreboard">
+
+<span id="team1">Team1</span>
+<span id="score1">0</span>
+
+-
+
+<span id="score2">0</span>
+<span id="team2">Team2</span>
+
+</div>
+
+<h2 id="time">0</h2>
+
+<div id="events"></div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyDRna9X7GVgBwj5xjECu-bJYos_1UMCLh4",
+authDomain: "chess-a4f8a.firebaseapp.com",
+databaseURL: "https://chess-a4f8a-default-rtdb.firebaseio.com",
+projectId: "chess-a4f8a",
+storageBucket: "chess-a4f8a.firebasestorage.app",
+messagingSenderId: "631062330530",
+appId: "1:631062330530:web:f003eabd02559c9b4dabfb"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let room="";
+let player="";
+let team="";
+let rating=0;
+
+let score1=0;
+let score2=0;
+
+window.joinRoom=function(){
+
+room=document.getElementById("roomInput").value;
+
+if(room=="") return;
+
+player="player"+Math.floor(Math.random()*10000);
+
+set(ref(db,"rooms/"+room+"/players/"+player),{
+team:null,
+ready:false
+});
+
+document.getElementById("home").style.display="none";
+document.getElementById("lobby").style.display="block";
+document.getElementById("roomName").innerText=room;
+
+listenRoom();
+
+}
+
+window.selectTeam=function(t,r){
+
+team=t;
+rating=r;
+
+update(ref(db,"rooms/"+room+"/players/"+player),{
+team:t
+});
+
+}
+
+window.ready=function(){
+
+update(ref(db,"rooms/"+room+"/players/"+player),{
+ready:true
+});
+
+}
+
+function listenRoom(){
+
+onValue(ref(db,"rooms/"+room+"/players"),(snapshot)=>{
+
+let players=snapshot.val();
+
+if(!players) return;
+
+let list=Object.values(players);
+
+if(list.length==2){
+
+let ready=list.every(p=>p.ready);
+
+if(ready){
+
+startMatch(list);
+
+}
+
+}
+
+});
+
+}
+
+function startMatch(players){
+
+document.getElementById("lobby").style.display="none";
+document.getElementById("match").style.display="block";
+
+document.getElementById("team1").innerText=players[0].team;
+document.getElementById("team2").innerText=players[1].team;
+
+simulate();
+
+}
+
+function simulate(){
+
+let minute=0;
+
+let timer=setInterval(()=>{
+
+minute++;
+
+document.getElementById("time").innerText=minute;
+
+event(minute);
+
+if(minute>=90) clearInterval(timer);
+
+},1000);
+
+}
+
+function event(minute){
+
+let chance=Math.random();
+
+if(chance<0.08){
+
+goal(minute);
+
+}
+else if(chance<0.13){
+
+add(minute+" 🟨 Yellow Card");
+
+}
+else if(chance<0.16){
+
+add(minute+" 🟥 Red Card");
+
+}
+else if(chance<0.20){
+
+add(minute+" 🚩 Corner");
+
+}
+
+}
+
+function goal(minute){
+
+if(Math.random()>0.5){
+
+score1++;
+document.getElementById("score1").innerText=score1;
+add(minute+" ⚽ GOAL");
+
+}else{
+
+score2++;
+document.getElementById("score2").innerText=score2;
+add(minute+" ⚽ GOAL");
+
+}
+
+}
+
+function add(text){
+
+let box=document.getElementById("events");
+
+box.innerHTML=text+"<br>"+box.innerHTML;
+
+}
+
+</script>
 
 </body>
-</html>qq
+</html>
